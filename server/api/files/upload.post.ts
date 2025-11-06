@@ -27,11 +27,11 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: 'Chat not found' })
     }
 
-    const canAccess =
-      session.user.role === 'admin' ||
-      chat.patientId === session.user.id ||
-      (session.user.role === 'healthcare_worker' &&
-        chat.districtId === session.user.districtId)
+    const canAccess
+      = session.user.role === 'admin'
+        || chat.patientId === session.user.id
+        || (session.user.role === 'healthcare_worker'
+          && chat.districtId === session.user.districtId)
 
     if (!canAccess) {
       throw createError({ statusCode: 403, message: 'Forbidden' })

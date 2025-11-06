@@ -24,14 +24,16 @@ export default defineEventHandler(async (event) => {
       .where(and(...conditions))
       .orderBy(tables.chats.createdAt)
       .all()
-  } else if (session.user.role === 'patient') {
+  }
+  else if (session.user.role === 'patient') {
     chats = await useDrizzle()
       .select()
       .from(tables.chats)
       .where(eq(tables.chats.patientId, session.user.id))
       .orderBy(tables.chats.createdAt)
       .all()
-  } else if (session.user.role === 'admin') {
+  }
+  else if (session.user.role === 'admin') {
     const conditions = []
     if (query.status) {
       conditions.push(eq(tables.chats.status, query.status as string))
@@ -43,7 +45,8 @@ export default defineEventHandler(async (event) => {
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(tables.chats.createdAt)
       .all()
-  } else {
+  }
+  else {
     throw createError({
       statusCode: 403,
       message: 'Forbidden'

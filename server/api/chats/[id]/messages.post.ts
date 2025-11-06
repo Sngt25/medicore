@@ -30,11 +30,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const canSend =
-    chat.patientId === session.user.id ||
-    (session.user.role === 'healthcare_worker' &&
-      (chat.assignedWorkerId === session.user.id ||
-        chat.districtId === session.user.districtId))
+  const canSend
+    = chat.patientId === session.user.id
+      || (session.user.role === 'healthcare_worker'
+        && (chat.assignedWorkerId === session.user.id
+          || chat.districtId === session.user.districtId))
 
   if (!canSend) {
     throw createError({
@@ -44,9 +44,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (
-    session.user.role === 'healthcare_worker' &&
-    !chat.assignedWorkerId &&
-    chat.status === 'queued'
+    session.user.role === 'healthcare_worker'
+    && !chat.assignedWorkerId
+    && chat.status === 'queued'
   ) {
     await useDrizzle()
       .update(tables.chats)

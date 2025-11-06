@@ -29,17 +29,18 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: 'Chat not found' })
     }
 
-    const canAccess =
-      session.user.role === 'admin' ||
-      chat.patientId === session.user.id ||
-      file.ownerId === session.user.id ||
-      (session.user.role === 'healthcare_worker' &&
-        chat.districtId === session.user.districtId)
+    const canAccess
+      = session.user.role === 'admin'
+        || chat.patientId === session.user.id
+        || file.ownerId === session.user.id
+        || (session.user.role === 'healthcare_worker'
+          && chat.districtId === session.user.districtId)
 
     if (!canAccess) {
       throw createError({ statusCode: 403, message: 'Forbidden' })
     }
-  } else {
+  }
+  else {
     // Non-chat file, only owner can access
     if (file.ownerId !== session.user.id && session.user.role !== 'admin') {
       throw createError({ statusCode: 403, message: 'Forbidden' })
@@ -47,7 +48,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Set security header
-  setHeader(event, 'Content-Security-Policy', "default-src 'none'")
+  setHeader(event, 'Content-Security-Policy', 'default-src \'none\'')
 
   // Serve the blob
   return hubBlob().serve(event, pathname)

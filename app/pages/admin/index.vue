@@ -23,7 +23,11 @@ const { data: workers } = useFetch<Worker[]>('/api/users', {
 
 <template>
   <UDashboardPanel>
-    <UDashboardNavbar title="Admin Console" />
+    <UDashboardNavbar title="Admin Console">
+      <template #leading>
+        <UDashboardSidebarCollapse />
+      </template>
+    </UDashboardNavbar>
 
     <UCard class="ring-0">
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

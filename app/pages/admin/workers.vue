@@ -61,6 +61,12 @@ const pagination = ref({
 })
 
 const statusFilter = ref('all')
+const emailFilterValue = ref('')
+
+const updateEmailFilter = (value: string) => {
+  emailFilterValue.value = value
+  table.value?.tableApi?.getColumn('email')?.setFilterValue(value)
+}
 
 const columns: TableColumn<Worker>[] = [
   {
@@ -253,13 +259,11 @@ function handleWorkerSaved() {
     <div class="flex flex-col gap-4 p-4">
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput
-          :model-value="(table?.tableApi?.getColumn('email')?.getFilterValue() as string)"
+          v-model="emailFilterValue"
           class="max-w-sm"
           icon="i-lucide-search"
           placeholder="Filter emails..."
-          @update:model-value="
-            table?.tableApi?.getColumn('email')?.setFilterValue($event)
-          "
+          @update:model-value="updateEmailFilter"
         />
 
         <div class="flex flex-wrap items-center gap-1.5">

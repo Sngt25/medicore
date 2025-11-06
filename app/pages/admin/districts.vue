@@ -40,6 +40,13 @@ const pagination = ref({
   pageSize: 10
 })
 
+const nameFilterValue = ref('')
+
+const updateNameFilter = (value: string) => {
+  nameFilterValue.value = value
+  table.value?.tableApi?.getColumn('name')?.setFilterValue(value)
+}
+
 const columns: TableColumn<District>[] = [
   {
     id: 'select',
@@ -168,13 +175,11 @@ function handleDistrictSaved() {
     <div class="flex flex-col gap-4 p-4">
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput
-          :model-value="(table?.tableApi?.getColumn('name')?.getFilterValue() as string)"
+          v-model="nameFilterValue"
           class="max-w-sm"
           icon="i-lucide-search"
           placeholder="Filter districts..."
-          @update:model-value="
-            table?.tableApi?.getColumn('name')?.setFilterValue($event)
-          "
+          @update:model-value="updateNameFilter"
         />
 
         <div class="flex flex-wrap items-center gap-1.5">

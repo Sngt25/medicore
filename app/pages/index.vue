@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { loggedIn, user, clear, openInPopup } = useUserSession()
+const { loggedIn, user, clear } = useUserSession()
 
 definePageMeta({
-  layout: false
+  middleware: 'guest'
 })
 </script>
 
@@ -36,7 +36,7 @@ definePageMeta({
             block
             size="lg"
             external
-            @click="openInPopup('/auth/google')"
+            to="/auth/google"
           >
             <template #leading>
               <UIcon

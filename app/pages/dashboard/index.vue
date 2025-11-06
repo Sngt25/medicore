@@ -21,7 +21,7 @@ const { data: activeChats, refresh: refreshActive } = await useFetch(
 const { data: tasks, refresh: refreshTasks } = await useFetch('/api/tasks')
 
 definePageMeta({
-  middleware: 'auth'
+  middleware: 'healthcare'
 })
 
 // WebSocket connection for real-time updates

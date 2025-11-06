@@ -23,8 +23,21 @@ export default defineEventHandler(async (event) => {
 
     if (roleFilter) {
       users = await useDrizzle()
-        .select()
+        .select({
+          id: tables.users.id,
+          email: tables.users.email,
+          name: tables.users.name,
+          role: tables.users.role,
+          districtId: tables.users.districtId,
+          districtName: tables.districts.name,
+          verified: tables.users.verified,
+          createdAt: tables.users.createdAt
+        })
         .from(tables.users)
+        .leftJoin(
+          tables.districts,
+          eq(tables.users.districtId, tables.districts.id)
+        )
         .where(
           eq(tables.users.role, roleFilter as 'admin' | 'healthcare_worker' | 'patient')
         )
@@ -32,8 +45,21 @@ export default defineEventHandler(async (event) => {
     }
     else {
       users = await useDrizzle()
-        .select()
+        .select({
+          id: tables.users.id,
+          email: tables.users.email,
+          name: tables.users.name,
+          role: tables.users.role,
+          districtId: tables.users.districtId,
+          districtName: tables.districts.name,
+          verified: tables.users.verified,
+          createdAt: tables.users.createdAt
+        })
         .from(tables.users)
+        .leftJoin(
+          tables.districts,
+          eq(tables.users.districtId, tables.districts.id)
+        )
         .all()
     }
 
@@ -43,6 +69,7 @@ export default defineEventHandler(async (event) => {
       name: user.name,
       role: user.role,
       districtId: user.districtId,
+      districtName: user.districtName,
       verified: user.verified,
       createdAt: user.createdAt
     }))

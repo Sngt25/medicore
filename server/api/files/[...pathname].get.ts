@@ -1,12 +1,13 @@
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
-  const pathname = getRouterParam(event, 'pathname')
+  let pathname = getRouterParam(event, 'pathname')
 
   if (!pathname) {
     throw createError({ statusCode: 400, message: 'Pathname is required' })
   }
 
-  // Get file metadata
+  pathname = decodeURIComponent(pathname)
+
   const file = await useDrizzle()
     .select()
     .from(tables.files)

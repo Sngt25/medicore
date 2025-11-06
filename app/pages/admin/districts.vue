@@ -18,8 +18,10 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { data: districts, refresh: refreshDistricts }
-  = useFetch<District[]>('/api/districts')
+const { data: districts, refresh: refreshDistricts, status }
+  = useFetch<District[]>('/api/districts', {
+    lazy: true
+  })
 
 const toast = useToast()
 const table = useTemplateRef('table')
@@ -202,8 +204,9 @@ function handleDistrictSaved() {
           getPaginationRowModel: getPaginationRowModel()
         }"
         class="shrink-0"
-        :data="districts || []"
+        :data="districts"
         :columns="columns"
+        :loading="status === 'pending'"
         :ui="{
           base: 'table-fixed border-separate border-spacing-0',
           thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
@@ -235,7 +238,6 @@ function handleDistrictSaved() {
           </span>
         </template>
       </UTable>
-
       <div
         class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
       >

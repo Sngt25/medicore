@@ -29,9 +29,10 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { data: workers, refresh: refreshWorkers } = useFetch<Worker[]>(
+const { data: workers, refresh: refreshWorkers, status } = useFetch<Worker[]>(
   '/api/users',
   {
+    lazy: true,
     query: { role: 'healthcare_worker' }
   }
 )
@@ -303,8 +304,9 @@ function handleWorkerSaved() {
           getPaginationRowModel: getPaginationRowModel()
         }"
         class="shrink-0"
-        :data="workers || []"
+        :data="workers"
         :columns="columns"
+        :loading="status === 'pending'"
         :ui="{
           base: 'table-fixed border-separate border-spacing-0',
           thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',

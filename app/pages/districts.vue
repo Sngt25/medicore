@@ -14,7 +14,7 @@ definePageMeta({
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-3xl font-bold">
-              Select Your District
+              Select Your Nearest RHU
             </h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">
               Choose a health district to start a conversation

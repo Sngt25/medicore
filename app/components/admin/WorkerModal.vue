@@ -24,7 +24,6 @@ const workerForm = reactive({
   districtId: ''
 })
 
-// Watch for worker changes to populate form
 watch(
   () => props.worker,
   (newWorker) => {
@@ -97,6 +96,7 @@ function handleClose() {
             type="email"
             placeholder="worker@example.com"
             :disabled="!!worker"
+            class="w-full"
           />
         </UFormField>
 
@@ -108,19 +108,16 @@ function handleClose() {
             v-model="workerForm.name"
             placeholder="Full name"
             :disabled="!!worker"
+            class="w-full"
           />
         </UFormField>
 
         <UFormField label="Assigned District">
           <USelect
             v-model="workerForm.districtId"
-            :options="[
-              { label: 'Unassigned', value: '' },
-              ...(districts || []).map((d: any) => ({
-                label: d.name,
-                value: d.id
-              }))
-            ]"
+            :items="districts.map(d => ({ id: d.id, label: d.name }))"
+            value-key="id"
+            class="w-full"
           />
         </UFormField>
 

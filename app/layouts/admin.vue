@@ -21,8 +21,8 @@ const items: NavigationMenuItem[][] = [
   ],
   [
     {
-      label: 'Feedback',
-      icon: 'i-heroicons-chat-bubble-left-right',
+      label: 'Districts',
+      icon: 'i-heroicons-building-office-2',
       to: '/districts',
       target: '_blank'
     }

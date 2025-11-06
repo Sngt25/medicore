@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: districts, status } = await useFetch('/api/districts')
+const { data: districts, status } = await useFetch<District[]>('/api/districts')
 const { user } = useUserSession()
 
 definePageMeta({
@@ -23,7 +23,7 @@ definePageMeta({
 
           <UButton
             to="/"
-            color="gray"
+            color="secondary"
             variant="outline"
             icon="i-heroicons-home"
           >
@@ -75,9 +75,8 @@ definePageMeta({
         >
           <UCard
             v-for="district in districts"
-            :key="district.id"
-            :ui="{ body: { padding: 'p-6 sm:p-6' } }"
-            class="hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+            :key="district?.id"
+            class="p-6 sm:p-6 hover:ring-2 hover:ring-primary transition-all cursor-pointer"
             @click="navigateTo(`/chat/new?districtId=${district.id}`)"
           >
             <div class="space-y-3">
@@ -124,7 +123,7 @@ definePageMeta({
 
         <UAlert
           icon="i-heroicons-information-circle"
-          color="blue"
+          color="info"
           variant="soft"
           title="Need immediate help?"
           description="If you're experiencing a medical emergency, please call emergency services immediately."

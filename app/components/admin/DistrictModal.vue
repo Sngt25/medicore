@@ -90,6 +90,7 @@ function handleClose() {
           <UInput
             v-model="districtForm.name"
             placeholder="e.g., Central District Health Center"
+            class="w-full"
           />
         </UFormField>
 
@@ -98,6 +99,7 @@ function handleClose() {
             v-model="districtForm.address"
             :rows="2"
             placeholder="Full address (optional)"
+            class="w-full"
           />
         </UFormField>
 
@@ -105,6 +107,7 @@ function handleClose() {
           <UInput
             v-model="districtForm.contactInfo"
             placeholder="Phone, email, or other contact info (optional)"
+            class="w-full"
           />
         </UFormField>
       </div>

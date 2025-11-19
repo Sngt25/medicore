@@ -60,7 +60,7 @@ function closeMobileSidebar() {
         Chat History
       </h2>
       <UButton
-        to="/"
+        to="/districts"
         color="secondary"
         variant="ghost"
         icon="i-heroicons-home"

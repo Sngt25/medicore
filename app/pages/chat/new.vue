@@ -14,6 +14,14 @@ const { data: district } = await useFetch<District>(`/api/districts`, {
   query: { id: districtId }
 })
 
+const isMobileSidebarOpen = inject<Ref<boolean>>('chatSidebarOpen')
+
+function openMobileSidebar() {
+  if (isMobileSidebarOpen) {
+    isMobileSidebarOpen.value = true
+  }
+}
+
 definePageMeta({
   middleware: 'auth',
   layout: 'chat'
@@ -67,11 +75,20 @@ async function createChat() {
       <div class="max-w-2xl mx-auto space-y-6">
         <div class="flex items-center gap-3">
           <UButton
+            icon="i-heroicons-bars-3"
+            color="secondary"
+            variant="ghost"
+            square
+            class="lg:hidden"
+            @click="openMobileSidebar"
+          />
+          <UButton
             to="/districts"
             color="secondary"
             variant="ghost"
             icon="i-heroicons-arrow-left"
             square
+            class="hidden lg:inline-flex"
           />
           <h1 class="text-2xl font-bold">
             Start New Conversation

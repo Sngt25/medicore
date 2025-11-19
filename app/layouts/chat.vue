@@ -3,12 +3,18 @@ const isMobileSidebarOpen = ref(false)
 
 provide('chatSidebarOpen', isMobileSidebarOpen)
 
-const { data: chats } = await useFetch<ChatX[]>('/api/chats')
+const selectedDistrict = useSelectedDistrict()
+
+const { data: chats } = await useFetch<ChatX[]>('/api/chats', {
+  query: computed(() => ({
+    districtId: selectedDistrict.value || undefined
+  }))
+})
+
 const { data: districts } = await useFetch<District[]>('/api/districts')
 
 const route = useRoute()
 const currentChatId = computed(() => route.params.id as string || undefined)
-const currentDistrictId = computed(() => route.query.districtId as string || undefined)
 </script>
 
 <template>
@@ -24,7 +30,6 @@ const currentDistrictId = computed(() => route.query.districtId as string || und
           :chats="chats"
           :districts="districts"
           :current-chat-id="currentChatId"
-          :current-district-id="currentDistrictId"
         />
       </template>
     </UDrawer>
@@ -37,7 +42,6 @@ const currentDistrictId = computed(() => route.query.districtId as string || und
             :chats="chats"
             :districts="districts"
             :current-chat-id="currentChatId"
-            :current-district-id="currentDistrictId"
           />
         </div>
       </aside>

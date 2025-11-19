@@ -3,7 +3,6 @@ const props = defineProps<{
   chats?: ChatX[]
   districts?: District[]
   currentChatId?: string
-  currentDistrictId?: string
 }>()
 
 const districtPrefixes = computed(() => {
@@ -103,7 +102,7 @@ function closeMobileSidebar() {
         :key="chat.id"
         class="cursor-pointer hover:ring-2 hover:ring-primary transition-all"
         :class="{
-          'ring-2 ring-primary': chat.id === currentChatId || chat.districtId === currentDistrictId
+          'ring-2 ring-primary': chat.id === currentChatId
         }"
         @click="() => {
           closeMobileSidebar()

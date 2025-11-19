@@ -5,6 +5,11 @@ const { user } = useUserSession()
 definePageMeta({
   middleware: 'auth'
 })
+
+function selectDistrict(districtId: string) {
+  useSelectedDistrict().value = districtId
+  navigateTo(`/chat/new?districtId=${districtId}`)
+}
 </script>
 
 <template>
@@ -77,7 +82,7 @@ definePageMeta({
             v-for="district in districts"
             :key="district?.id"
             class="p-6 sm:p-6 hover:ring-2 hover:ring-primary transition-all cursor-pointer"
-            @click="navigateTo(`/chat/new?districtId=${district.id}`)"
+            @click="selectDistrict(district.id)"
           >
             <div class="space-y-3">
               <div class="flex items-start justify-between">

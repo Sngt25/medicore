@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const conditions = [eq(tables.chats.districtId, session.user.districtId)]
 
     if (query.status) {
-      conditions.push(eq(tables.chats.status, query.status as string))
+      conditions.push(eq(tables.chats.status, query.status as 'queued' | 'active' | 'closed'))
     }
 
     chats = await useDrizzle()
@@ -26,17 +26,23 @@ export default defineEventHandler(async (event) => {
       .all()
   }
   else if (session.user.role === 'patient') {
+    const conditions = [eq(tables.chats.patientId, session.user.id)]
+
+    if (query.districtId) {
+      conditions.push(eq(tables.chats.districtId, query.districtId as string))
+    }
+
     chats = await useDrizzle()
       .select()
       .from(tables.chats)
-      .where(eq(tables.chats.patientId, session.user.id))
+      .where(and(...conditions))
       .orderBy(tables.chats.createdAt)
       .all()
   }
   else if (session.user.role === 'admin') {
     const conditions = []
     if (query.status) {
-      conditions.push(eq(tables.chats.status, query.status as string))
+      conditions.push(eq(tables.chats.status, query.status as 'queued' | 'active' | 'closed'))
     }
 
     chats = await useDrizzle()

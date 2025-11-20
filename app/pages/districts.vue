@@ -43,6 +43,16 @@ const logout = async () => {
             </UButton>
 
             <UButton
+              v-if="user?.role === 'healthcare_worker'"
+              to="/dashboard"
+              color="secondary"
+              variant="outline"
+              icon="i-material-symbols-dashboard"
+            >
+              Dashboard
+            </UButton>
+
+            <UButton
               color="error"
               variant="outline"
               icon="i-tabler-logout"

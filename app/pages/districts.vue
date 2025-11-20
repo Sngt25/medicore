@@ -10,6 +10,11 @@ function selectDistrict(districtId: string) {
   useSelectedDistrict().value = districtId
   navigateTo(`/chat/new?districtId=${districtId}`)
 }
+
+const logout = async () => {
+  useUserSession().clear()
+  return navigateTo('/')
+}
 </script>
 
 <template>
@@ -26,14 +31,26 @@ function selectDistrict(districtId: string) {
             </p>
           </div>
 
-          <UButton
-            to="/"
-            color="secondary"
-            variant="outline"
-            icon="i-heroicons-home"
-          >
-            Home
-          </UButton>
+          <div class="space-x-2">
+            <UButton
+              v-if="user?.role === 'admin'"
+              to="/admin"
+              color="secondary"
+              variant="outline"
+              icon="i-material-symbols-dashboard"
+            >
+              Dashboard
+            </UButton>
+
+            <UButton
+              color="error"
+              variant="outline"
+              icon="i-tabler-logout"
+              @click="logout()"
+            >
+              Logout
+            </UButton>
+          </div>
         </div>
 
         <UCard

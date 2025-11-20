@@ -23,8 +23,7 @@ const items: NavigationMenuItem[][] = [
     {
       label: 'Districts',
       icon: 'i-heroicons-building-office-2',
-      to: '/districts',
-      target: '_blank'
+      to: '/districts'
     }
   ]
 ]

@@ -1,0 +1,87 @@
+export default defineEventHandler(async (event) => {
+  const session = await requireUserSession(event)
+  const id = getRouterParam(event, 'id')
+  const body = await readBody(event)
+
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      message: 'Chat ID is required'
+    })
+  }
+
+  const chat = await useDrizzle()
+    .select()
+    .from(tables.chats)
+    .where(eq(tables.chats.id, id))
+    .get()
+
+  if (!chat) {
+    throw createError({
+      statusCode: 404,
+      message: 'Chat not found'
+    })
+  }
+
+  // Authorization check
+  const canUpdate
+    = session.user.role === 'admin'
+      || (session.user.role === 'healthcare_worker'
+        && chat.districtId === session.user.districtId)
+
+  if (!canUpdate) {
+    throw createError({
+      statusCode: 403,
+      message: 'Forbidden'
+    })
+  }
+
+  const updateData: Partial<typeof tables.chats.$inferInsert> = {}
+
+  // Healthcare workers can update status and assign themselves
+  if (body.status !== undefined) {
+    const validStatuses = ['queued', 'active', 'closed']
+    if (!validStatuses.includes(body.status)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid status'
+      })
+    }
+    updateData.status = body.status
+
+    // When accepting a chat, assign it to the worker
+    if (body.status === 'active' && session.user.role === 'healthcare_worker') {
+      updateData.assignedWorkerId = session.user.id
+    }
+
+    // When closing a chat, set the closedAt timestamp
+    if (body.status === 'closed') {
+      updateData.closedAt = new Date()
+    }
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    throw createError({
+      statusCode: 400,
+      message: 'No fields to update'
+    })
+  }
+
+  const updatedChat = await useDrizzle()
+    .update(tables.chats)
+    .set(updateData)
+    .where(eq(tables.chats.id, id))
+    .returning()
+    .get()
+
+  await useDrizzle()
+    .insert(tables.auditLogs)
+    .values({
+      userId: session.user.id,
+      action: 'chat_updated',
+      detail: { chatId: updatedChat.id, changes: updateData }
+    })
+    .run()
+
+  return updatedChat
+})

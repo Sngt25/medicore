@@ -1,12 +1,44 @@
 <script setup lang="ts">
 const { data: districts, status } = await useFetch<District[]>('/api/districts')
 const { user } = useUserSession()
+const toast = useToast()
 
 definePageMeta({
   middleware: 'auth'
 })
 
-function selectDistrict(districtId: string) {
+async function selectDistrict(districtId: string) {
+  // If user is a healthcare worker, update their district assignment
+  if (user.value?.role === 'healthcare_worker') {
+    try {
+      await $fetch(`/api/users/${user.value.id}`, {
+        method: 'PATCH',
+        body: { districtId }
+      })
+
+      // Fetch the updated session
+      await useUserSession().fetch()
+
+      toast.add({
+        title: 'District assigned',
+        description: 'You have been assigned to this district',
+        color: 'success'
+      })
+
+      // Redirect to dashboard with force refresh
+      return navigateTo('/dashboard', { replace: true })
+    }
+    catch (error: unknown) {
+      toast.add({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to assign district',
+        color: 'error'
+      })
+      return
+    }
+  }
+
+  // For patients, proceed with chat creation
   useSelectedDistrict().value = districtId
   navigateTo(`/chat/new?districtId=${districtId}`)
 }
@@ -24,10 +56,10 @@ const logout = async () => {
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-3xl font-bold">
-              Select Your Nearest RHU
+              {{ user?.role === 'healthcare_worker' ? 'Select Your District' : 'Select Your Nearest RHU' }}
             </h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">
-              Choose a health district to start a conversation
+              {{ user?.role === 'healthcare_worker' ? 'Choose the health district you work in' : 'Choose a health district to start a conversation' }}
             </p>
           </div>
 

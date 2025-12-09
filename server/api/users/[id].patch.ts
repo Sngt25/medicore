@@ -1,15 +1,19 @@
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
+  const id = getRouterParam(event, 'id')
+  const body = await readBody(event)
 
-  if (session.user.role !== 'admin') {
+  // Healthcare workers can update their own district
+  const isUpdatingSelf = session.user.id === id
+  const isHealthcareWorker = session.user.role === 'healthcare_worker'
+  const isAdmin = session.user.role === 'admin'
+
+  if (!isAdmin && !(isHealthcareWorker && isUpdatingSelf)) {
     throw createError({
       statusCode: 403,
       message: 'Forbidden: Admin access required'
     })
   }
-
-  const id = getRouterParam(event, 'id')
-  const body = await readBody(event)
 
   if (!id) {
     throw createError({
@@ -33,15 +37,19 @@ export default defineEventHandler(async (event) => {
 
   const updateData: Partial<typeof tables.users.$inferInsert> = {}
 
-  if (body.name !== undefined) {
+  if (body.name !== undefined && isAdmin) {
     updateData.name = body.name
   }
 
   if (body.districtId !== undefined) {
-    updateData.districtId = body.districtId
+    // Healthcare workers can update their own district
+    // Admins can update any user's district
+    if (isAdmin || (isHealthcareWorker && isUpdatingSelf)) {
+      updateData.districtId = body.districtId
+    }
   }
 
-  if (body.role !== undefined) {
+  if (body.role !== undefined && isAdmin) {
     const validRoles = ['admin', 'healthcare_worker', 'patient']
     if (!validRoles.includes(body.role)) {
       throw createError({

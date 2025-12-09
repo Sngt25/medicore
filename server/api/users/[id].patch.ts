@@ -83,6 +83,16 @@ export default defineEventHandler(async (event) => {
     })
     .run()
 
+  // Update the session if the user is updating their own district
+  if (isHealthcareWorker && isUpdatingSelf && updateData.districtId) {
+    await setUserSession(event, {
+      user: {
+        ...session.user,
+        districtId: user.districtId
+      }
+    })
+  }
+
   return {
     id: user.id,
     email: user.email,

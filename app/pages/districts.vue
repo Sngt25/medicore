@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { data: districts, status } = await useFetch<District[]>('/api/districts')
-const { user } = useUserSession()
+const { user, fetch } = useUserSession()
 const toast = useToast()
 
 definePageMeta({
@@ -8,16 +8,16 @@ definePageMeta({
 })
 
 async function selectDistrict(districtId: string) {
-  // If user is a healthcare worker, update their district assignment
   if (user.value?.role === 'healthcare_worker') {
     try {
+      // Update the user's district in the database (also updates session on server)
       await $fetch(`/api/users/${user.value.id}`, {
         method: 'PATCH',
         body: { districtId }
       })
 
-      // Fetch the updated session
-      await useUserSession().fetch()
+      // Fetch the updated session from the server
+      await fetch()
 
       toast.add({
         title: 'District assigned',
@@ -25,7 +25,7 @@ async function selectDistrict(districtId: string) {
         color: 'success'
       })
 
-      // Redirect to dashboard with force refresh
+      // Redirect to dashboard - session should now be updated
       return navigateTo('/dashboard', { replace: true })
     }
     catch (error: unknown) {

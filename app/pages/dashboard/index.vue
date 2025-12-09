@@ -3,6 +3,7 @@ const toast = useToast()
 const ws = ref<WebSocket | null>(null)
 const activeTab = ref('queue')
 const showAcceptDialog = ref(false)
+const { user } = useUserSession()
 
 interface ChatType {
   id: string
@@ -15,7 +16,6 @@ interface ChatType {
 
 const selectedChat = ref<ChatType | null>(null)
 
-// Fetch queued, active, and closed chats
 const { data: queuedChats, refresh: refreshQueue } = await useFetch<ChatType[]>(
   '/api/chats',
   {
@@ -45,7 +45,14 @@ definePageMeta({
   layout: 'healthcare'
 })
 
-// WebSocket connection for real-time updates
+// Watch for district changes and refresh all chats
+watch(() => user.value?.districtId, async (newDistrictId, oldDistrictId) => {
+  if (newDistrictId && newDistrictId !== oldDistrictId) {
+    console.log('District changed, refreshing chats...')
+    await Promise.all([refreshQueue(), refreshActive(), refreshClosed()])
+  }
+}, { immediate: false })
+
 onMounted(() => {
   connectWebSocket()
 })

@@ -18,11 +18,11 @@ const emit = defineEmits<{
 }>()
 
 const queueColumns = [
-  { key: 'patient', label: 'Patient' },
-  { key: 'district', label: 'District' },
-  { key: 'description', label: 'Description' },
-  { key: 'created', label: 'Created' },
-  { key: 'actions', label: '' }
+  { id: 'patient', header: 'Patient' },
+  { id: 'district', header: 'District' },
+  { id: 'description', header: 'Description' },
+  { id: 'created', header: 'Created' },
+  { id: 'actions', header: '' }
 ] as const
 </script>
 
@@ -36,43 +36,43 @@ const queueColumns = [
 
     <UTable
       :columns="queueColumns as any"
-      :rows="chats || []"
+      :data="chats || []"
     >
       <!-- @vue-ignore -->
-      <template #patient-data="{ row }">
+      <template #patient-cell="{ row }">
         <div class="flex items-center gap-2">
           <UAvatar
-            :src="(row as any).patient?.avatar"
-            :alt="(row as any).patient?.name"
+            :src="(row as any).original.patient?.avatar"
+            :alt="(row as any).original.patient?.name"
             size="xs"
           />
-          <span>{{ (row as any).patient?.name }}</span>
+          <span>{{ (row as any).original.patient?.name }}</span>
         </div>
       </template>
 
       <!-- @vue-ignore -->
-      <template #district-data="{ row }">
-        {{ (row as any).district?.name }}
+      <template #district-cell="{ row }">
+        {{ (row as any).original.district?.name }}
       </template>
 
       <!-- @vue-ignore -->
-      <template #description-data="{ row }">
+      <template #description-cell="{ row }">
         <p class="max-w-xs truncate">
-          {{ (row as any).initialDescription }}
+          {{ (row as any).original.initialDescription }}
         </p>
       </template>
 
       <!-- @vue-ignore -->
-      <template #created-data="{ row }">
-        {{ new Date((row as any).createdAt).toLocaleString() }}
+      <template #created-cell="{ row }">
+        {{ new Date((row as any).original.createdAt).toLocaleString() }}
       </template>
 
       <!-- @vue-ignore -->
-      <template #actions-data="{ row }">
+      <template #actions-cell="{ row }">
         <UButton
           color="primary"
           size="xs"
-          @click="emit('accept', row as any)"
+          @click="emit('accept', (row as any).original)"
         >
           Accept
         </UButton>

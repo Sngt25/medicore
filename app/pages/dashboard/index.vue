@@ -233,16 +233,18 @@ async function closeChat(chatId: string) {
         <UTabs
           v-model="activeTab"
           :items="[
-            { label: 'Queue', value: 'queue', icon: 'i-heroicons-clock' },
+            { label: 'Queue', value: 'queue', icon: 'i-heroicons-clock', slot: 'queue' },
             {
               label: 'Active Chats',
               value: 'active',
-              icon: 'i-heroicons-chat-bubble-left-right'
+              icon: 'i-heroicons-chat-bubble-left-right',
+              slot: 'active'
             },
             {
               label: 'Closed Chats',
               value: 'closed',
-              icon: 'i-heroicons-check-circle'
+              icon: 'i-heroicons-check-circle',
+              slot: 'closed'
             }
           ]"
         >

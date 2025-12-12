@@ -362,6 +362,7 @@ async function closeChat() {
               v-if="chat?.status === 'queued'"
               color="primary"
               icon="i-heroicons-check"
+              size="sm"
               @click="showAcceptModal = true"
             >
               Accept
@@ -369,9 +370,9 @@ async function closeChat() {
             <UButton
               v-else-if="chat?.status === 'active'"
               color="error"
-              variant="ghost"
+              variant="soft"
               icon="i-heroicons-x-mark"
-              square
+              size="sm"
               @click="showCloseModal = true"
             >
               Close

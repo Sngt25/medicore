@@ -73,6 +73,7 @@ const queueColumns = [
           <UButton
             :to="`/chat/${(row as any).original.id}`"
             color="primary"
+            variant="subtle"
             size="xs"
           >
             Open

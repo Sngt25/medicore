@@ -41,6 +41,7 @@ defineProps<Props>()
             <UButton
               :to="`/chat/${chat.id}`"
               color="primary"
+              variant="subtle"
               size="sm"
             >
               Open Chat

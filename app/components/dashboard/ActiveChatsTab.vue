@@ -44,6 +44,7 @@ const emit = defineEmits<{
             <UButton
               :to="`/chat/${chat.id}`"
               color="primary"
+              variant="subtle"
               size="sm"
             >
               Open Chat

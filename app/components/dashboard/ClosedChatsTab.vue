@@ -37,12 +37,21 @@ defineProps<Props>()
               </p>
             </div>
           </div>
-          <UBadge
-            color="neutral"
-            variant="subtle"
-          >
-            Closed
-          </UBadge>
+          <div class="flex gap-2">
+            <UButton
+              :to="`/chat/${chat.id}`"
+              color="primary"
+              size="sm"
+            >
+              Open Chat
+            </UButton>
+            <UBadge
+              color="neutral"
+              variant="subtle"
+            >
+              Closed
+            </UBadge>
+          </div>
         </div>
 
         <p class="text-sm text-gray-600 dark:text-gray-400">

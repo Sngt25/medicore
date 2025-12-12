@@ -69,13 +69,22 @@ const queueColumns = [
 
       <!-- @vue-ignore -->
       <template #actions-cell="{ row }">
-        <UButton
-          color="primary"
-          size="xs"
-          @click="emit('accept', (row as any).original)"
-        >
-          Accept
-        </UButton>
+        <div class="flex gap-2">
+          <UButton
+            :to="`/chat/${(row as any).original.id}`"
+            color="primary"
+            size="xs"
+          >
+            Open
+          </UButton>
+          <UButton
+            color="primary"
+            size="xs"
+            @click="emit('accept', (row as any).original)"
+          >
+            Accept
+          </UButton>
+        </div>
       </template>
     </UTable>
 

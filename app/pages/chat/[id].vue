@@ -388,20 +388,13 @@ async function closeChat() {
     >
       <UContainer class="py-6">
         <div class="max-w-4xl mx-auto space-y-4">
-          <UCard class="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <UIcon
-                  name="i-heroicons-document-text"
-                  class="w-5 h-5 text-blue-600"
-                />
-                <span class="font-semibold text-blue-900 dark:text-blue-100">Initial Description</span>
-              </div>
-              <p class="text-gray-700 dark:text-gray-300">
-                {{ chat?.initialDescription }}
-              </p>
-            </div>
-          </UCard>
+          <UAlert
+            color="info"
+            variant="subtle"
+            icon="i-heroicons-information-circle"
+            title="Initial Description"
+            :description="chat?.initialDescription"
+          />
 
           <div
             v-for="message in chat?.messages"

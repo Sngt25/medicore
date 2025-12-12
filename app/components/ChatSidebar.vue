@@ -5,6 +5,8 @@ const props = defineProps<{
   currentChatId?: string
 }>()
 
+const { user } = useUserSession()
+
 const districtPrefixes = computed(() => {
   const prefixMap: Record<string, string> = {}
   const prefixes = ['BHD-', 'EHD-', 'WHD-']
@@ -59,7 +61,7 @@ function closeMobileSidebar() {
         Chat History
       </h2>
       <UButton
-        to="/districts"
+        :to="user?.role === 'healthcare_worker' ? '/dashboard' : '/districts'"
         color="secondary"
         variant="ghost"
         icon="i-heroicons-home"
@@ -68,6 +70,7 @@ function closeMobileSidebar() {
     </div>
 
     <UButton
+      v-if="user?.role !== 'healthcare_worker'"
       to="/districts"
       color="primary"
       variant="outline"

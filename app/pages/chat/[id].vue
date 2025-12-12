@@ -10,6 +10,8 @@ const messageBody = ref('')
 const messagesContainer = ref<HTMLElement>()
 const uploadedFiles = ref<string[]>([])
 const isUploading = ref(false)
+const showAcceptModal = ref(false)
+const showCloseModal = ref(false)
 
 const { data: chat, refresh: refreshChat } = await useFetch<ChatX>(
   `/api/chats/${chatId.value}`
@@ -257,6 +259,56 @@ function openMobileSidebar() {
     isMobileSidebarOpen.value = true
   }
 }
+
+async function acceptChat() {
+  try {
+    await $fetch(`/api/chats/${chatId.value}`, {
+      method: 'PATCH',
+      body: { status: 'active' }
+    })
+
+    toast.add({
+      title: 'Success',
+      description: 'Chat accepted successfully',
+      color: 'success'
+    })
+
+    showAcceptModal.value = false
+    await refreshChat()
+  }
+  catch (error) {
+    toast.add({
+      title: 'Error',
+      description: (error as { data?: { message?: string } }).data?.message || 'Failed to accept chat',
+      color: 'error'
+    })
+  }
+}
+
+async function closeChat() {
+  try {
+    await $fetch(`/api/chats/${chatId.value}`, {
+      method: 'PATCH',
+      body: { status: 'closed' }
+    })
+
+    toast.add({
+      title: 'Success',
+      description: 'Chat closed successfully',
+      color: 'success'
+    })
+
+    showCloseModal.value = false
+    await refreshChat()
+  }
+  catch (error) {
+    toast.add({
+      title: 'Error',
+      description: (error as { data?: { message?: string } }).data?.message || 'Failed to close chat',
+      color: 'error'
+    })
+  }
+}
 </script>
 
 <template>
@@ -274,7 +326,7 @@ function openMobileSidebar() {
               @click="openMobileSidebar"
             />
             <UButton
-              to="/districts"
+              :to="user?.role === 'healthcare_worker' ? '/dashboard' : '/districts'"
               color="secondary"
               variant="ghost"
               icon="i-heroicons-arrow-left"
@@ -304,6 +356,26 @@ function openMobileSidebar() {
                 </ClientOnly>
               </div>
             </div>
+          </div>
+          <div v-if="user?.role === 'healthcare_worker'">
+            <UButton
+              v-if="chat?.status === 'queued'"
+              color="primary"
+              icon="i-heroicons-check"
+              @click="showAcceptModal = true"
+            >
+              Accept
+            </UButton>
+            <UButton
+              v-else-if="chat?.status === 'active'"
+              color="error"
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              square
+              @click="showCloseModal = true"
+            >
+              Close
+            </UButton>
           </div>
         </div>
       </UContainer>
@@ -452,7 +524,7 @@ function openMobileSidebar() {
               color="secondary"
               variant="ghost"
               :loading="isUploading"
-              :disabled="chat?.status === 'closed'"
+              :disabled="chat?.status === 'closed' || (chat?.status === 'queued' && user?.role === 'healthcare_worker')"
               @click="openFileDialog()"
             />
             <UTextarea
@@ -461,13 +533,13 @@ function openMobileSidebar() {
               :rows="1"
               autoresize
               class="flex-1"
-              :disabled="chat?.status === 'closed'"
+              :disabled="chat?.status === 'closed' || (chat?.status === 'queued' && user?.role === 'healthcare_worker')"
               @keydown.enter.prevent="sendMessage"
             />
             <UButton
               icon="i-heroicons-paper-airplane"
               color="primary"
-              :disabled="(!messageBody.trim() && uploadedFiles.length === 0) || chat?.status === 'closed'"
+              :disabled="(!messageBody.trim() && uploadedFiles.length === 0) || chat?.status === 'closed' || (chat?.status === 'queued' && user?.role === 'healthcare_worker')"
               @click="sendMessage"
             />
           </div>
@@ -477,8 +549,28 @@ function openMobileSidebar() {
           >
             This conversation has been closed
           </p>
+          <p
+            v-if="chat?.status === 'queued' && user?.role === 'healthcare_worker'"
+            class="text-sm text-gray-500 mt-2"
+          >
+            Accept first to start messaging...
+          </p>
         </div>
       </UContainer>
     </div>
+
+    <DashboardAcceptChatModal
+      v-model="showAcceptModal"
+      :chat="chat || null"
+      @accept="acceptChat"
+      @cancel="showAcceptModal = false"
+    />
+
+    <DashboardCloseChatModal
+      v-model="showCloseModal"
+      :chat="chat || null"
+      @close="closeChat"
+      @cancel="showCloseModal = false"
+    />
   </div>
 </template>

@@ -361,6 +361,7 @@ async function closeChat() {
             <UButton
               v-if="chat?.status === 'queued'"
               color="primary"
+              variant="soft"
               icon="i-heroicons-check"
               size="sm"
               @click="showAcceptModal = true"

@@ -358,26 +358,37 @@ async function closeChat() {
             </div>
           </div>
           <div v-if="user?.role === 'healthcare_worker'">
-            <UButton
-              v-if="chat?.status === 'queued'"
-              color="primary"
-              variant="soft"
-              icon="i-heroicons-check"
-              size="sm"
-              @click="showAcceptModal = true"
-            >
-              Accept
-            </UButton>
-            <UButton
-              v-else-if="chat?.status === 'active'"
-              color="error"
-              variant="soft"
-              icon="i-heroicons-x-mark"
-              size="sm"
-              @click="showCloseModal = true"
-            >
-              Close
-            </UButton>
+            <div class="flex items-center gap-2">
+              <DashboardTaskQuickCreateButton
+                v-if="chat?.status === 'active'"
+                :chat-id="chatId"
+                :patient-id="chat?.patientId"
+                size="sm"
+                variant="outline"
+                icon="i-heroicons-clipboard-document-list"
+                label=""
+              />
+              <UButton
+                v-if="chat?.status === 'queued'"
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-check"
+                size="sm"
+                @click="showAcceptModal = true"
+              >
+                Accept
+              </UButton>
+              <UButton
+                v-else-if="chat?.status === 'active'"
+                color="error"
+                variant="soft"
+                icon="i-heroicons-x-mark"
+                size="sm"
+                @click="showCloseModal = true"
+              >
+                Close
+              </UButton>
+            </div>
           </div>
         </div>
       </UContainer>
@@ -483,6 +494,17 @@ async function closeChat() {
               No messages yet. Start the conversation!
             </p>
           </div>
+        </div>
+      </UContainer>
+    </div>
+
+    <div
+      v-if="user?.role === 'healthcare_worker'"
+      class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+    >
+      <UContainer class="py-4">
+        <div class="max-w-4xl mx-auto">
+          <DashboardChatTasksList :chat-id="chatId" />
         </div>
       </UContainer>
     </div>

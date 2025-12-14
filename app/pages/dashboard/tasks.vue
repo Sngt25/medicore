@@ -10,9 +10,10 @@ interface Task {
   title: string
   description?: string
   status: 'todo' | 'in_progress' | 'done'
-  patientId?: string
-  chatId?: string
-  dueDate?: string
+  linkedPatientId?: string
+  linkedChatId?: string
+  dueAt?: Date
+  priority: 'low' | 'medium' | 'high'
   createdAt: Date
   patient?: {
     name: string
@@ -101,7 +102,11 @@ const columns: TableColumn<Task>[] = [
     header: 'Status'
   },
   {
-    accessorKey: 'dueDate',
+    accessorKey: 'priority',
+    header: 'Priority'
+  },
+  {
+    accessorKey: 'dueAt',
     header: 'Due Date'
   },
   {
@@ -258,7 +263,7 @@ function handleTaskSaved() {
         <template #status-cell="{ row }">
           <UBadge
             :color="
-              row.original.status === 'completed'
+              row.original.status === 'done'
                 ? 'success'
                 : row.original.status === 'in_progress'
                   ? 'info'
@@ -266,15 +271,31 @@ function handleTaskSaved() {
             "
             size="xs"
           >
-            {{ row.original.status.replace('_', ' ') }}
+            {{ row.original.status === 'in_progress' ? 'In Progress' : row.original.status === 'done' ? 'Done' : 'To Do' }}
           </UBadge>
         </template>
 
-        <template #dueDate-cell="{ row }">
+        <template #priority-cell="{ row }">
+          <UBadge
+            :color="
+              row.original.priority === 'high'
+                ? 'error'
+                : row.original.priority === 'medium'
+                  ? 'warning'
+                  : 'neutral'
+            "
+            size="xs"
+            variant="subtle"
+          >
+            {{ row.original.priority }}
+          </UBadge>
+        </template>
+
+        <template #dueAt-cell="{ row }">
           <span class="text-muted">
             {{
-              row.original.dueDate
-                ? new Date(row.original.dueDate).toLocaleDateString()
+              row.original.dueAt
+                ? new Date(row.original.dueAt).toLocaleDateString()
                 : 'N/A'
             }}
           </span>

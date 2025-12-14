@@ -22,6 +22,10 @@ export default defineEventHandler(async (event) => {
     conditions.push(eq(tables.tasks.linkedPatientId, query.patientId as string))
   }
 
+  if (query.chatId) {
+    conditions.push(eq(tables.tasks.linkedChatId, query.chatId as string))
+  }
+
   const tasks = await useDrizzle()
     .select()
     .from(tables.tasks)

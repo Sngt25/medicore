@@ -3,6 +3,8 @@
 const props = defineProps<{
   open: boolean
   task?: any
+  chatId?: string
+  patientId?: string
 }>()
 
 const emit = defineEmits<{
@@ -20,30 +22,34 @@ const isOpen = computed({
 const taskForm = reactive({
   title: '',
   description: '',
-  patientId: '',
-  chatId: '',
-  status: 'pending' as 'pending' | 'in_progress' | 'completed',
-  dueDate: ''
+  linkedPatientId: '',
+  linkedChatId: '',
+  status: 'todo' as 'todo' | 'in_progress' | 'done',
+  dueAt: '',
+  priority: 'medium' as 'low' | 'medium' | 'high'
 })
 
 watch(
-  () => props.task,
-  (newTask) => {
+  () => [props.task, props.chatId, props.patientId, props.open],
+  ([newTask, newChatId, newPatientId]) => {
     if (newTask) {
       taskForm.title = newTask.title
       taskForm.description = newTask.description || ''
-      taskForm.patientId = newTask.patientId || ''
-      taskForm.chatId = newTask.chatId || ''
+      taskForm.linkedPatientId = newTask.linkedPatientId || ''
+      taskForm.linkedChatId = newTask.linkedChatId || ''
       taskForm.status = newTask.status
-      taskForm.dueDate = newTask.dueDate || ''
+      const dueAtDate = newTask.dueAt ? new Date(newTask.dueAt).toISOString().split('T')[0] : ''
+      taskForm.dueAt = dueAtDate || ''
+      taskForm.priority = newTask.priority || 'medium'
     }
     else {
       taskForm.title = ''
       taskForm.description = ''
-      taskForm.patientId = ''
-      taskForm.chatId = ''
-      taskForm.status = 'pending'
-      taskForm.dueDate = ''
+      taskForm.linkedPatientId = (newPatientId as string | undefined) || ''
+      taskForm.linkedChatId = (newChatId as string | undefined) || ''
+      taskForm.status = 'todo'
+      taskForm.dueAt = ''
+      taskForm.priority = 'medium'
     }
   },
   { immediate: true }
@@ -112,41 +118,68 @@ function handleClose() {
           />
         </UFormField>
 
-        <UFormField
-          label="Status"
-          required
-        >
-          <USelect
-            v-model="taskForm.status"
-            :options="[
-              { label: 'Pending', value: 'pending' },
-              { label: 'In Progress', value: 'in_progress' },
-              { label: 'Completed', value: 'completed' }
-            ]"
-            class="w-full"
-          />
-        </UFormField>
+        <div class="grid grid-cols-2 gap-4">
+          <UFormField
+            label="Status"
+            required
+          >
+            <USelect
+              v-model="taskForm.status"
+              value-attribute="value"
+              option-attribute="label"
+              :options="[
+                { label: 'To Do', value: 'todo' },
+                { label: 'In Progress', value: 'in_progress' },
+                { label: 'Done', value: 'done' }
+              ]"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Priority"
+            required
+          >
+            <USelect
+              v-model="taskForm.priority"
+              value-attribute="value"
+              option-attribute="label"
+              :options="[
+                { label: 'Low', value: 'low' },
+                { label: 'Medium', value: 'medium' },
+                { label: 'High', value: 'high' }
+              ]"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
 
         <UFormField label="Due Date">
           <UInput
-            v-model="taskForm.dueDate"
+            v-model="taskForm.dueAt"
             type="date"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Patient ID">
+        <UFormField
+          v-if="taskForm.linkedChatId"
+          label="Linked Chat"
+        >
           <UInput
-            v-model="taskForm.patientId"
-            placeholder="Patient ID (optional)"
+            :model-value="taskForm.linkedChatId"
+            disabled
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Chat ID">
+        <UFormField
+          v-if="taskForm.linkedPatientId"
+          label="Linked Patient"
+        >
           <UInput
-            v-model="taskForm.chatId"
-            placeholder="Chat ID (optional)"
+            :model-value="taskForm.linkedPatientId"
+            disabled
             class="w-full"
           />
         </UFormField>

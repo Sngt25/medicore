@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface Chat {
   id: string
+  patientId: string
   patient?: { name: string, avatar?: string }
   district?: { name: string }
   initialDescription?: string
@@ -46,6 +47,14 @@ defineProps<Props>()
             >
               Open Chat
             </UButton>
+            <DashboardTaskQuickCreateButton
+              :chat-id="chat.id"
+              :patient-id="chat.patientId"
+              size="sm"
+              variant="ghost"
+              icon="i-heroicons-clipboard-document-list"
+              label=""
+            />
             <UBadge
               color="neutral"
               variant="subtle"

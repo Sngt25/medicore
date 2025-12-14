@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface Chat {
   id: string
+  patientId: string
   patient?: { name: string, avatar?: string }
   district?: { name: string }
   initialDescription?: string
@@ -85,6 +86,14 @@ const queueColumns = [
           >
             Accept
           </UButton>
+          <DashboardTaskQuickCreateButton
+            :chat-id="(row as any).original.id"
+            :patient-id="(row as any).original.patientId"
+            size="xs"
+            variant="ghost"
+            icon="i-heroicons-clipboard-document-list"
+            label=""
+          />
         </div>
       </template>
     </UTable>

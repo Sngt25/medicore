@@ -7,6 +7,7 @@ const { user } = useUserSession()
 
 interface ChatType {
   id: string
+  patientId: string
   patient?: { name: string, avatar?: string }
   district?: { name: string }
   initialDescription?: string

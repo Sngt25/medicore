@@ -125,13 +125,12 @@ function handleClose() {
           >
             <USelect
               v-model="taskForm.status"
-              value-attribute="value"
-              option-attribute="label"
-              :options="[
-                { label: 'To Do', value: 'todo' },
-                { label: 'In Progress', value: 'in_progress' },
-                { label: 'Done', value: 'done' }
+              :items="[
+                { id: 'todo', label: 'To Do' },
+                { id: 'in_progress', label: 'In Progress' },
+                { id: 'done', label: 'Done' }
               ]"
+              value-key="id"
               class="w-full"
             />
           </UFormField>
@@ -142,13 +141,12 @@ function handleClose() {
           >
             <USelect
               v-model="taskForm.priority"
-              value-attribute="value"
-              option-attribute="label"
-              :options="[
-                { label: 'Low', value: 'low' },
-                { label: 'Medium', value: 'medium' },
-                { label: 'High', value: 'high' }
+              :items="[
+                { id: 'low', label: 'Low' },
+                { id: 'medium', label: 'Medium' },
+                { id: 'high', label: 'High' }
               ]"
+              value-key="id"
               class="w-full"
             />
           </UFormField>

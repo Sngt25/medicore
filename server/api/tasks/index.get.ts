@@ -27,8 +27,26 @@ export default defineEventHandler(async (event) => {
   }
 
   const tasks = await useDrizzle()
-    .select()
+    .select({
+      id: tables.tasks.id,
+      title: tables.tasks.title,
+      description: tables.tasks.description,
+      dueAt: tables.tasks.dueAt,
+      priority: tables.tasks.priority,
+      status: tables.tasks.status,
+      linkedPatientId: tables.tasks.linkedPatientId,
+      linkedChatId: tables.tasks.linkedChatId,
+      createdByWorkerId: tables.tasks.createdByWorkerId,
+      createdAt: tables.tasks.createdAt,
+      updatedAt: tables.tasks.updatedAt,
+      patient: {
+        id: tables.users.id,
+        name: tables.users.name,
+        email: tables.users.email
+      }
+    })
     .from(tables.tasks)
+    .leftJoin(tables.users, eq(tables.tasks.linkedPatientId, tables.users.id))
     .where(and(...conditions))
     .orderBy(tables.tasks.dueAt, tables.tasks.priority)
     .all()

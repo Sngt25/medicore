@@ -11,6 +11,7 @@ interface Task {
 
 const props = defineProps<{
   chatId: string
+  readOnly?: boolean
 }>()
 
 const toast = useToast()
@@ -98,6 +99,7 @@ const getPriorityColor = (priority: string) => {
         </div>
         <div class="flex items-center gap-2">
           <UButton
+            v-if="!readOnly"
             icon="i-heroicons-plus"
             size="xs"
             variant="soft"
@@ -128,6 +130,7 @@ const getPriorityColor = (priority: string) => {
       >
         <div class="flex items-start gap-3">
           <UCheckbox
+            v-if="!readOnly"
             :model-value="task.status === 'done'"
             class="mt-0.5"
             @update:model-value="toggleTaskStatus(task)"
@@ -143,6 +146,7 @@ const getPriorityColor = (priority: string) => {
                 {{ task.title }}
               </h4>
               <UButton
+                v-if="!readOnly"
                 icon="i-heroicons-pencil"
                 variant="ghost"
                 color="neutral"
@@ -185,13 +189,14 @@ const getPriorityColor = (priority: string) => {
       <UEmpty
         v-if="!tasks || tasks.length === 0"
         icon="i-heroicons-clipboard-document-list"
-        title="No tasks"
-        description="Create a task to track work for this chat"
+        :title="readOnly ? 'No tasks' : 'No tasks'"
+        :description="readOnly ? 'No tasks were created for this chat' : 'Create a task to track work for this chat'"
         class="py-6"
       />
     </div>
 
     <DashboardTaskModal
+      v-if="!readOnly"
       v-model:open="isTaskModalOpen"
       :task="selectedTask"
       :chat-id="chatId"

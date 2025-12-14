@@ -16,9 +16,10 @@ interface Task {
   priority: 'low' | 'medium' | 'high'
   createdAt: Date
   patient?: {
+    id: string
     name: string
-    avatar?: string
-  }
+    email: string
+  } | null
 }
 
 definePageMeta({
@@ -255,8 +256,19 @@ function handleTaskSaved() {
         </template>
 
         <template #patient-cell="{ row }">
-          <span class="text-muted">
-            {{ row.original.patient?.name || 'N/A' }}
+          <div v-if="row.original.patient">
+            <div class="font-medium">
+              {{ row.original.patient.name }}
+            </div>
+            <div class="text-xs text-muted">
+              {{ row.original.patient.email }}
+            </div>
+          </div>
+          <span
+            v-else
+            class="text-muted"
+          >
+            N/A
           </span>
         </template>
 

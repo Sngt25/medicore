@@ -499,12 +499,15 @@ async function closeChat() {
     </div>
 
     <div
-      v-if="user?.role === 'healthcare_worker'"
+      v-if="user?.role === 'healthcare_worker' && chat?.status !== 'queued'"
       class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
     >
       <UContainer class="py-4">
         <div class="max-w-4xl mx-auto">
-          <DashboardChatTasksList :chat-id="chatId" />
+          <DashboardChatTasksList
+            :chat-id="chatId"
+            :read-only="chat?.status === 'closed'"
+          />
         </div>
       </UContainer>
     </div>

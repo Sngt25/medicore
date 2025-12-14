@@ -86,14 +86,6 @@ const queueColumns = [
           >
             Accept
           </UButton>
-          <DashboardTaskQuickCreateButton
-            :chat-id="(row as any).original.id"
-            :patient-id="(row as any).original.patientId"
-            size="xs"
-            variant="ghost"
-            icon="i-heroicons-clipboard-document-list"
-            label=""
-          />
         </div>
       </template>
     </UTable>

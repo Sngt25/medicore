@@ -359,15 +359,6 @@ async function closeChat() {
           </div>
           <div v-if="user?.role === 'healthcare_worker'">
             <div class="flex items-center gap-2">
-              <DashboardTaskQuickCreateButton
-                v-if="chat?.status === 'active'"
-                :chat-id="chatId"
-                :patient-id="chat?.patientId"
-                size="sm"
-                variant="outline"
-                icon="i-heroicons-clipboard-document-list"
-                label=""
-              />
               <UButton
                 v-if="chat?.status === 'queued'"
                 color="primary"

@@ -48,9 +48,6 @@ export default defineNuxtConfig({
     // In dev: uses better-sqlite3
     // In production with Cloudflare: uses d1 (set NUXT_HUB_DB_CONNECTION_DATABASE_ID)
     db: 'sqlite',
-    // KV namespace - auto-configures based on provider
-    // For production, set NUXT_HUB_KV_NAMESPACE_ID env var
-    kv: true,
     // R2 Blob storage - auto-configures for Cloudflare
     // For production, set NUXT_HUB_BLOB_BUCKET_NAME env var
     blob: true

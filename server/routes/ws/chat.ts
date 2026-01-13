@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import * as tables from '../../database/schema'
+import * as tables from '../../db/schema'
 
 // WebSocket handler for real-time messaging
 export default defineWebSocketHandler({

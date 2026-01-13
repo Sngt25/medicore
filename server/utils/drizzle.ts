@@ -1,11 +1,12 @@
-// Re-export db and schema from hub:db (auto-imported in NuxtHub v0.10)
-// The db instance is auto-imported on server-side, but we keep these exports for type safety
-export { db, schema } from 'hub:db'
+// Note: db and schema are auto-imported by NuxtHub v0.10
+// They are available globally in server-side code without explicit imports
+
+import * as schemaImport from '../db/schema'
 
 export { sql, eq, and, or } from 'drizzle-orm'
 
-// For backwards compatibility, export schema as tables
-export { schema as tables } from 'hub:db'
+// Export schema as tables for backwards compatibility
+export const tables = schemaImport
 
 // Deprecated: use `db` directly instead of `useDrizzle()`
 // The db instance is auto-imported on server-side
@@ -13,11 +14,11 @@ export function useDrizzle() {
   return db
 }
 
-// Type exports - update path from database to db
-export type User = typeof schema.users.$inferSelect
-export type District = typeof schema.districts.$inferSelect
-export type Chat = typeof schema.chats.$inferSelect
-export type Message = typeof schema.messages.$inferSelect
-export type Task = typeof schema.tasks.$inferSelect
-export type File = typeof schema.files.$inferSelect
-export type AuditLog = typeof schema.auditLogs.$inferSelect
+// Type exports
+export type User = typeof schemaImport.users.$inferSelect
+export type District = typeof schemaImport.districts.$inferSelect
+export type Chat = typeof schemaImport.chats.$inferSelect
+export type Message = typeof schemaImport.messages.$inferSelect
+export type Task = typeof schemaImport.tasks.$inferSelect
+export type File = typeof schemaImport.files.$inferSelect
+export type AuditLog = typeof schemaImport.auditLogs.$inferSelect

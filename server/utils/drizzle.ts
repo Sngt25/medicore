@@ -1,15 +1,19 @@
-import { drizzle } from 'drizzle-orm/d1'
-
-import * as schema from '../database/schema'
+// Re-export db and schema from hub:db (auto-imported in NuxtHub v0.10)
+// The db instance is auto-imported on server-side, but we keep these exports for type safety
+export { db, schema } from 'hub:db'
 
 export { sql, eq, and, or } from 'drizzle-orm'
 
-export const tables = schema
+// For backwards compatibility, export schema as tables
+export { schema as tables } from 'hub:db'
 
+// Deprecated: use `db` directly instead of `useDrizzle()`
+// The db instance is auto-imported on server-side
 export function useDrizzle() {
-  return drizzle(hubDatabase(), { schema })
+  return db
 }
 
+// Type exports - update path from database to db
 export type User = typeof schema.users.$inferSelect
 export type District = typeof schema.districts.$inferSelect
 export type Chat = typeof schema.chats.$inferSelect

@@ -44,8 +44,18 @@ export default defineNuxtConfig({
 
   // https://hub.nuxt.com/docs/getting-started/installation#options
   hub: {
-    database: true,
-    workers: true,
+    // D1 database - auto-configures for Cloudflare
+    // For production, set NUXT_HUB_DB_CONNECTION_DATABASE_ID env var
+    db: {
+      dialect: 'sqlite',
+      driver: 'd1'
+      // connection: { databaseId: '<database-id>' } // Set via env var instead
+    },
+    // KV namespace - auto-configures based on provider
+    // For production, set NUXT_HUB_KV_NAMESPACE_ID env var
+    kv: true,
+    // R2 Blob storage - auto-configures for Cloudflare
+    // For production, set NUXT_HUB_BLOB_BUCKET_NAME env var
     blob: true
   },
 

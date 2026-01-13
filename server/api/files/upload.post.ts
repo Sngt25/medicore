@@ -1,3 +1,5 @@
+import { blob } from 'hub:blob'
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
 
@@ -39,7 +41,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Upload to blob storage
-  const blob = await hubBlob().put(file.name, file, {
+  const uploadedBlob = await blob.put(file.name, file, {
     addRandomSuffix: true,
     prefix: chatId ? `chats/${chatId}` : `users/${session.user.id}`
   })
@@ -50,7 +52,7 @@ export default defineEventHandler(async (event) => {
     .values({
       ownerId: session.user.id,
       chatId: chatId || null,
-      pathname: blob.pathname,
+      pathname: uploadedBlob.pathname,
       filename: file.name,
       mimeType: file.type,
       size: file.size

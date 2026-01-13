@@ -1,3 +1,5 @@
+import { blob } from 'hub:blob'
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   let pathname = getRouterParam(event, 'pathname')
@@ -52,5 +54,5 @@ export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Security-Policy', 'default-src \'none\'')
 
   // Serve the blob
-  return hubBlob().serve(event, pathname)
+  return blob.serve(event, pathname)
 })

@@ -44,12 +44,7 @@ export default defineNuxtConfig({
 
   // https://hub.nuxt.com/docs/getting-started/installation#options
   hub: {
-    // SQLite database - auto-configures driver based on environment
-    // In dev: uses better-sqlite3
-    // In production with Cloudflare: uses d1 (set NUXT_HUB_DB_CONNECTION_DATABASE_ID)
     db: 'sqlite',
-    // R2 Blob storage - auto-configures for Cloudflare
-    // For production, set NUXT_HUB_BLOB_BUCKET_NAME env var
     blob: true
   },
 

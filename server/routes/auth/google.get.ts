@@ -53,21 +53,21 @@ export default defineOAuthGoogleEventHandler({
     // Set user session
     await setUserSession(event, {
       user: {
-        id: dbUser.id,
-        email: dbUser.email,
-        name: dbUser.name,
-        role: dbUser.role,
-        districtId: dbUser.districtId,
+        id: dbUser?.id,
+        email: dbUser?.email,
+        name: dbUser?.name,
+        role: dbUser?.role,
+        districtId: dbUser?.districtId,
         avatar: user.picture
       },
       loggedInAt: Date.now()
     })
 
     // Redirect based on role
-    if (dbUser.role === 'admin') {
+    if (dbUser?.role === 'admin') {
       return sendRedirect(event, '/admin')
     }
-    else if (dbUser.role === 'healthcare_worker') {
+    else if (dbUser?.role === 'healthcare_worker') {
       return sendRedirect(event, '/dashboard')
     }
     else {

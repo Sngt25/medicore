@@ -10,10 +10,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const chat = await useDrizzle()
+  const chat = await db
     .select()
-    .from(tables.chats)
-    .where(eq(tables.chats.id, id))
+    .from(schema.chats)
+    .where(eq(schema.chats.id, id))
     .get()
 
   if (!chat) {
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const updateData: Partial<typeof tables.chats.$inferInsert> = {}
+  const updateData: Partial<typeof schema.chats.$inferInsert> = {}
 
   // Healthcare workers can update status and assign themselves
   if (body.status !== undefined) {
@@ -67,15 +67,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const updatedChat = await useDrizzle()
-    .update(tables.chats)
+  const updatedChat = await db
+    .update(schema.chats)
     .set(updateData)
-    .where(eq(tables.chats.id, id))
+    .where(eq(schema.chats.id, id))
     .returning()
     .get()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'chat_updated',

@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const district = await useDrizzle()
-    .insert(tables.districts)
+  const district = await db
+    .insert(schema.districts)
     .values({
       name: body.name,
       address: body.address || null,
@@ -27,8 +27,8 @@ export default defineEventHandler(async (event) => {
     .returning()
     .get()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'district_created',

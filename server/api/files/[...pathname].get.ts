@@ -10,10 +10,10 @@ export default defineEventHandler(async (event) => {
 
   pathname = decodeURIComponent(pathname)
 
-  const file = await useDrizzle()
+  const file = await db
     .select()
-    .from(tables.files)
-    .where(eq(tables.files.pathname, pathname))
+    .from(schema.files)
+    .where(eq(schema.files.pathname, pathname))
     .get()
 
   if (!file) {
@@ -22,10 +22,10 @@ export default defineEventHandler(async (event) => {
 
   // Check permissions
   if (file.chatId) {
-    const chat = await useDrizzle()
+    const chat = await db
       .select()
-      .from(tables.chats)
-      .where(eq(tables.chats.id, file.chatId))
+      .from(schema.chats)
+      .where(eq(schema.chats.id, file.chatId))
       .get()
 
     if (!chat) {

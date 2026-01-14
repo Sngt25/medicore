@@ -1,5 +1,4 @@
 import { eq } from 'drizzle-orm'
-import * as tables from '../../db/schema'
 
 export default defineOAuthGoogleEventHandler({
   // config: {
@@ -11,13 +10,12 @@ export default defineOAuthGoogleEventHandler({
   // },
   async onSuccess(event, { user }) {
     const config = useRuntimeConfig(event)
-    const db = useDrizzle()
 
     // Check if user exists
     const existingUser = await db
       .select()
-      .from(tables.users)
-      .where(eq(tables.users.googleSub, user.sub))
+      .from(schema.users)
+      .where(eq(schema.users.googleSub, user.sub))
       .get()
 
     let dbUser = existingUser
@@ -33,7 +31,7 @@ export default defineOAuthGoogleEventHandler({
       const isAdmin = adminEmails.includes(user.email)
 
       dbUser = await db
-        .insert(tables.users)
+        .insert(schema.users)
         .values({
           email: user.email,
           name: user.name || user.email,
@@ -45,7 +43,7 @@ export default defineOAuthGoogleEventHandler({
         .get()
 
       // Log user creation
-      await db.insert(tables.auditLogs).values({
+      await db.insert(schema.auditLogs).values({
         userId: dbUser.id,
         action: 'user_created',
         detail: { method: 'google_oauth', role: dbUser.role }

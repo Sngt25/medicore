@@ -19,10 +19,10 @@ export default defineEventHandler(async (event) => {
 
   // If chatId provided, verify access
   if (chatId) {
-    const chat = await useDrizzle()
+    const chat = await db
       .select()
-      .from(tables.chats)
-      .where(eq(tables.chats.id, chatId))
+      .from(schema.chats)
+      .where(eq(schema.chats.id, chatId))
       .get()
 
     if (!chat) {
@@ -47,8 +47,8 @@ export default defineEventHandler(async (event) => {
   })
 
   // Store file metadata in database
-  const fileRecord = await useDrizzle()
-    .insert(tables.files)
+  const fileRecord = await db
+    .insert(schema.files)
     .values({
       ownerId: session.user.id,
       chatId: chatId || null,

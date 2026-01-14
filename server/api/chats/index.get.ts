@@ -12,49 +12,49 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const conditions = [eq(tables.chats.districtId, session.user.districtId)]
+    const conditions = [eq(schema.chats.districtId, session.user.districtId)]
 
     if (query.status) {
-      conditions.push(eq(tables.chats.status, query.status as 'queued' | 'active' | 'closed'))
+      conditions.push(eq(schema.chats.status, query.status as 'queued' | 'active' | 'closed'))
 
       // For active and closed chats, only show chats assigned to this worker
       if (query.status === 'active' || query.status === 'closed') {
-        conditions.push(eq(tables.chats.assignedWorkerId, session.user.id))
+        conditions.push(eq(schema.chats.assignedWorkerId, session.user.id))
       }
     }
 
-    chats = await useDrizzle()
+    chats = await db
       .select()
-      .from(tables.chats)
+      .from(schema.chats)
       .where(and(...conditions))
-      .orderBy(tables.chats.createdAt)
+      .orderBy(schema.chats.createdAt)
       .all()
   }
   else if (session.user.role === 'patient') {
-    const conditions = [eq(tables.chats.patientId, session.user.id)]
+    const conditions = [eq(schema.chats.patientId, session.user.id)]
 
     if (query.districtId) {
-      conditions.push(eq(tables.chats.districtId, query.districtId as string))
+      conditions.push(eq(schema.chats.districtId, query.districtId as string))
     }
 
-    chats = await useDrizzle()
+    chats = await db
       .select()
-      .from(tables.chats)
+      .from(schema.chats)
       .where(and(...conditions))
-      .orderBy(tables.chats.createdAt)
+      .orderBy(schema.chats.createdAt)
       .all()
   }
   else if (session.user.role === 'admin') {
     const conditions = []
     if (query.status) {
-      conditions.push(eq(tables.chats.status, query.status as 'queued' | 'active' | 'closed'))
+      conditions.push(eq(schema.chats.status, query.status as 'queued' | 'active' | 'closed'))
     }
 
-    chats = await useDrizzle()
+    chats = await db
       .select()
-      .from(tables.chats)
+      .from(schema.chats)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(tables.chats.createdAt)
+      .orderBy(schema.chats.createdAt)
       .all()
   }
   else {
@@ -68,20 +68,20 @@ export default defineEventHandler(async (event) => {
   const enrichedChats = await Promise.all(
     chats.map(async (chat) => {
       const [patient, district] = await Promise.all([
-        useDrizzle()
+        db
           .select({
-            id: tables.users.id,
-            name: tables.users.name,
-            email: tables.users.email,
-            avatar: sql<string>`'https://avatar.vercel.sh/' || ${tables.users.email}`
+            id: schema.users.id,
+            name: schema.users.name,
+            email: schema.users.email,
+            avatar: sql<string>`'https://avatar.vercel.sh/' || ${schema.users.email}`
           })
-          .from(tables.users)
-          .where(eq(tables.users.id, chat.patientId))
+          .from(schema.users)
+          .where(eq(schema.users.id, chat.patientId))
           .get(),
-        useDrizzle()
+        db
           .select()
-          .from(tables.districts)
-          .where(eq(tables.districts.id, chat.districtId))
+          .from(schema.districts)
+          .where(eq(schema.districts.id, chat.districtId))
           .get()
       ])
 

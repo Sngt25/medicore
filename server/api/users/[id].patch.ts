@@ -22,10 +22,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const existingUser = await useDrizzle()
+  const existingUser = await db
     .select()
-    .from(tables.users)
-    .where(eq(tables.users.id, id))
+    .from(schema.users)
+    .where(eq(schema.users.id, id))
     .get()
 
   if (!existingUser) {
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const updateData: Partial<typeof tables.users.$inferInsert> = {}
+  const updateData: Partial<typeof schema.users.$inferInsert> = {}
 
   if (body.name !== undefined && isAdmin) {
     updateData.name = body.name
@@ -67,15 +67,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await useDrizzle()
-    .update(tables.users)
+  const user = await db
+    .update(schema.users)
     .set(updateData)
-    .where(eq(tables.users.id, id))
+    .where(eq(schema.users.id, id))
     .returning()
     .get()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'user_updated',

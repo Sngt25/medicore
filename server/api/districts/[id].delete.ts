@@ -17,16 +17,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const users = await useDrizzle()
+  const users = await db
     .select()
-    .from(tables.users)
-    .where(eq(tables.users.districtId, id))
+    .from(schema.users)
+    .where(eq(schema.users.districtId, id))
     .all()
 
-  const chats = await useDrizzle()
+  const chats = await db
     .select()
-    .from(tables.chats)
-    .where(eq(tables.chats.districtId, id))
+    .from(schema.chats)
+    .where(eq(schema.chats.districtId, id))
     .all()
 
   if (users.length > 0 || chats.length > 0) {
@@ -36,13 +36,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await useDrizzle()
-    .delete(tables.districts)
-    .where(eq(tables.districts.id, id))
+  await db
+    .delete(schema.districts)
+    .where(eq(schema.districts.id, id))
     .run()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'district_deleted',

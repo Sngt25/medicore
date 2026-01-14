@@ -10,45 +10,45 @@ export default defineEventHandler(async (event) => {
 
   const query = getQuery(event)
 
-  const conditions = [eq(tables.tasks.createdByWorkerId, session.user.id)]
+  const conditions = [eq(schema.tasks.createdByWorkerId, session.user.id)]
 
   if (query.status) {
     conditions.push(
-      eq(tables.tasks.status, query.status as 'todo' | 'in_progress' | 'done')
+      eq(schema.tasks.status, query.status as 'todo' | 'in_progress' | 'done')
     )
   }
 
   if (query.patientId) {
-    conditions.push(eq(tables.tasks.linkedPatientId, query.patientId as string))
+    conditions.push(eq(schema.tasks.linkedPatientId, query.patientId as string))
   }
 
   if (query.chatId) {
-    conditions.push(eq(tables.tasks.linkedChatId, query.chatId as string))
+    conditions.push(eq(schema.tasks.linkedChatId, query.chatId as string))
   }
 
-  const tasks = await useDrizzle()
+  const tasks = await db
     .select({
-      id: tables.tasks.id,
-      title: tables.tasks.title,
-      description: tables.tasks.description,
-      dueAt: tables.tasks.dueAt,
-      priority: tables.tasks.priority,
-      status: tables.tasks.status,
-      linkedPatientId: tables.tasks.linkedPatientId,
-      linkedChatId: tables.tasks.linkedChatId,
-      createdByWorkerId: tables.tasks.createdByWorkerId,
-      createdAt: tables.tasks.createdAt,
-      updatedAt: tables.tasks.updatedAt,
+      id: schema.tasks.id,
+      title: schema.tasks.title,
+      description: schema.tasks.description,
+      dueAt: schema.tasks.dueAt,
+      priority: schema.tasks.priority,
+      status: schema.tasks.status,
+      linkedPatientId: schema.tasks.linkedPatientId,
+      linkedChatId: schema.tasks.linkedChatId,
+      createdByWorkerId: schema.tasks.createdByWorkerId,
+      createdAt: schema.tasks.createdAt,
+      updatedAt: schema.tasks.updatedAt,
       patient: {
-        id: tables.users.id,
-        name: tables.users.name,
-        email: tables.users.email
+        id: schema.users.id,
+        name: schema.users.name,
+        email: schema.users.email
       }
     })
-    .from(tables.tasks)
-    .leftJoin(tables.users, eq(tables.tasks.linkedPatientId, tables.users.id))
+    .from(schema.tasks)
+    .leftJoin(schema.users, eq(schema.tasks.linkedPatientId, schema.users.id))
     .where(and(...conditions))
-    .orderBy(tables.tasks.dueAt, tables.tasks.priority)
+    .orderBy(schema.tasks.dueAt, schema.tasks.priority)
     .all()
 
   return tasks

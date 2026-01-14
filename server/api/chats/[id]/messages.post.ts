@@ -17,10 +17,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const chat = await useDrizzle()
+  const chat = await db
     .select()
-    .from(tables.chats)
-    .where(eq(tables.chats.id, chatId))
+    .from(schema.chats)
+    .where(eq(schema.chats.id, chatId))
     .get()
 
   if (!chat) {
@@ -48,17 +48,17 @@ export default defineEventHandler(async (event) => {
     && !chat.assignedWorkerId
     && chat.status === 'queued'
   ) {
-    await useDrizzle()
-      .update(tables.chats)
+    await db
+      .update(schema.chats)
       .set({
         assignedWorkerId: session.user.id,
         status: 'active'
       })
-      .where(eq(tables.chats.id, chatId))
+      .where(eq(schema.chats.id, chatId))
       .run()
 
-    await useDrizzle()
-      .insert(tables.auditLogs)
+    await db
+      .insert(schema.auditLogs)
       .values({
         userId: session.user.id,
         action: 'chat_assigned',
@@ -66,8 +66,8 @@ export default defineEventHandler(async (event) => {
       })
   }
 
-  const message = await useDrizzle()
-    .insert(tables.messages)
+  const message = await db
+    .insert(schema.messages)
     .values({
       chatId,
       senderId: session.user.id,

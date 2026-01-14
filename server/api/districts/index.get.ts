@@ -3,19 +3,19 @@ export default defineEventHandler(async (event) => {
   const id = query.id as string | undefined
 
   if (id) {
-    const district = await useDrizzle()
+    const district = await db
       .select()
-      .from(tables.districts)
-      .where(eq(tables.districts.id, id))
+      .from(schema.districts)
+      .where(eq(schema.districts.id, id))
       .get()
 
     return district
   }
 
-  const districts = await useDrizzle()
+  const districts = await db
     .select()
-    .from(tables.districts)
-    .orderBy(tables.districts.name)
+    .from(schema.districts)
+    .orderBy(schema.districts.name)
     .all()
 
   return districts

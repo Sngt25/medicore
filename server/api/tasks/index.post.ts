@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const task = await useDrizzle()
-    .insert(tables.tasks)
+  const task = await db
+    .insert(schema.tasks)
     .values({
       title: body.title,
       description: body.description || null,

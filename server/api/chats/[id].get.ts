@@ -9,10 +9,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const chat = await useDrizzle()
+  const chat = await db
     .select()
-    .from(tables.chats)
-    .where(eq(tables.chats.id, id))
+    .from(schema.chats)
+    .where(eq(schema.chats.id, id))
     .get()
 
   if (!chat) {
@@ -35,40 +35,40 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const district = await useDrizzle()
+  const district = await db
     .select()
-    .from(tables.districts)
-    .where(eq(tables.districts.id, chat.districtId))
+    .from(schema.districts)
+    .where(eq(schema.districts.id, chat.districtId))
     .get()
 
-  const patient = await useDrizzle()
+  const patient = await db
     .select()
-    .from(tables.users)
-    .where(eq(tables.users.id, chat.patientId))
+    .from(schema.users)
+    .where(eq(schema.users.id, chat.patientId))
     .get()
 
   let assignedWorker = null
   if (chat.assignedWorkerId) {
-    assignedWorker = await useDrizzle()
+    assignedWorker = await db
       .select()
-      .from(tables.users)
-      .where(eq(tables.users.id, chat.assignedWorkerId))
+      .from(schema.users)
+      .where(eq(schema.users.id, chat.assignedWorkerId))
       .get()
   }
 
-  const messages = await useDrizzle()
+  const messages = await db
     .select()
-    .from(tables.messages)
-    .where(eq(tables.messages.chatId, id))
-    .orderBy(tables.messages.createdAt)
+    .from(schema.messages)
+    .where(eq(schema.messages.chatId, id))
+    .orderBy(schema.messages.createdAt)
     .all()
 
   const messagesWithSender = await Promise.all(
     messages.map(async (message) => {
-      const sender = await useDrizzle()
+      const sender = await db
         .select()
-        .from(tables.users)
-        .where(eq(tables.users.id, message.senderId))
+        .from(schema.users)
+        .where(eq(schema.users.id, message.senderId))
         .get()
       return {
         ...message,

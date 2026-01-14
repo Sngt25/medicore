@@ -18,13 +18,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const existingTask = await useDrizzle()
+  const existingTask = await db
     .select()
-    .from(tables.tasks)
+    .from(schema.tasks)
     .where(
       and(
-        eq(tables.tasks.id, id),
-        eq(tables.tasks.createdByWorkerId, session.user.id)
+        eq(schema.tasks.id, id),
+        eq(schema.tasks.createdByWorkerId, session.user.id)
       )
     )
     .get()
@@ -36,8 +36,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const task = await useDrizzle()
-    .update(tables.tasks)
+  const task = await db
+    .update(schema.tasks)
     .set({
       title: body.title,
       description: body.description,
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
       priority: body.priority,
       status: body.status
     })
-    .where(eq(tables.tasks.id, id))
+    .where(eq(schema.tasks.id, id))
     .returning()
     .get()
 

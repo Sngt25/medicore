@@ -17,10 +17,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const user = await useDrizzle()
+  const user = await db
     .select()
-    .from(tables.users)
-    .where(eq(tables.users.id, id))
+    .from(schema.users)
+    .where(eq(schema.users.id, id))
     .get()
 
   if (!user) {
@@ -37,10 +37,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const chats = await useDrizzle()
+  const chats = await db
     .select()
-    .from(tables.chats)
-    .where(eq(tables.chats.assignedWorkerId, id))
+    .from(schema.chats)
+    .where(eq(schema.chats.assignedWorkerId, id))
     .all()
 
   if (chats.length > 0) {
@@ -51,10 +51,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await useDrizzle().delete(tables.users).where(eq(tables.users.id, id)).run()
+  await db.delete(schema.users).where(eq(schema.users.id, id)).run()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'user_deleted',

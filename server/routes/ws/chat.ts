@@ -1,5 +1,4 @@
 import { eq } from 'drizzle-orm'
-import * as tables from '../../db/schema'
 
 // WebSocket handler for real-time messaging
 export default defineWebSocketHandler({
@@ -23,7 +22,6 @@ export default defineWebSocketHandler({
       )
       console.log('[ws] Message received:', data)
 
-      const db = useDrizzle()
 
       if (data.action === 'subscribe_chat') {
         const chatId = data.chatId
@@ -36,8 +34,8 @@ export default defineWebSocketHandler({
         // Verify access to chat
         const chat = await db
           .select()
-          .from(tables.chats)
-          .where(eq(tables.chats.id, chatId))
+          .from(schema.chats)
+          .where(eq(schema.chats.id, chatId))
           .get()
 
         if (!chat) {

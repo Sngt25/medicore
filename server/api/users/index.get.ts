@@ -22,43 +22,43 @@ export default defineEventHandler(async (event) => {
     let users
 
     if (roleFilter) {
-      users = await useDrizzle()
+      users = await db
         .select({
-          id: tables.users.id,
-          email: tables.users.email,
-          name: tables.users.name,
-          role: tables.users.role,
-          districtId: tables.users.districtId,
-          districtName: tables.districts.name,
-          verified: tables.users.verified,
-          createdAt: tables.users.createdAt
+          id: schema.users.id,
+          email: schema.users.email,
+          name: schema.users.name,
+          role: schema.users.role,
+          districtId: schema.users.districtId,
+          districtName: schema.districts.name,
+          verified: schema.users.verified,
+          createdAt: schema.users.createdAt
         })
-        .from(tables.users)
+        .from(schema.users)
         .leftJoin(
-          tables.districts,
-          eq(tables.users.districtId, tables.districts.id)
+          schema.districts,
+          eq(schema.users.districtId, schema.districts.id)
         )
         .where(
-          eq(tables.users.role, roleFilter as 'admin' | 'healthcare_worker' | 'patient')
+          eq(schema.users.role, roleFilter as 'admin' | 'healthcare_worker' | 'patient')
         )
         .all()
     }
     else {
-      users = await useDrizzle()
+      users = await db
         .select({
-          id: tables.users.id,
-          email: tables.users.email,
-          name: tables.users.name,
-          role: tables.users.role,
-          districtId: tables.users.districtId,
-          districtName: tables.districts.name,
-          verified: tables.users.verified,
-          createdAt: tables.users.createdAt
+          id: schema.users.id,
+          email: schema.users.email,
+          name: schema.users.name,
+          role: schema.users.role,
+          districtId: schema.users.districtId,
+          districtName: schema.districts.name,
+          verified: schema.users.verified,
+          createdAt: schema.users.createdAt
         })
-        .from(tables.users)
+        .from(schema.users)
         .leftJoin(
-          tables.districts,
-          eq(tables.users.districtId, tables.districts.id)
+          schema.districts,
+          eq(schema.users.districtId, schema.districts.id)
         )
         .all()
     }

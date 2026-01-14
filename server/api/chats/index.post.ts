@@ -9,10 +9,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const district = await useDrizzle()
+  const district = await db
     .select()
-    .from(tables.districts)
-    .where(eq(tables.districts.id, body.districtId))
+    .from(schema.districts)
+    .where(eq(schema.districts.id, body.districtId))
     .get()
 
   if (!district) {
@@ -22,8 +22,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const chat = await useDrizzle()
-    .insert(tables.chats)
+  const chat = await db
+    .insert(schema.chats)
     .values({
       districtId: body.districtId,
       patientId: session.user.id,
@@ -33,8 +33,8 @@ export default defineEventHandler(async (event) => {
     .returning()
     .get()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'chat_created',

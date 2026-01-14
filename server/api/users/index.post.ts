@@ -39,10 +39,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const existingUser = await useDrizzle()
+  const existingUser = await db
     .select()
-    .from(tables.users)
-    .where(eq(tables.users.email, body.email))
+    .from(schema.users)
+    .where(eq(schema.users.email, body.email))
     .get()
 
   if (existingUser) {
@@ -54,8 +54,8 @@ export default defineEventHandler(async (event) => {
 
   const googleSub = `pending_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-  const user = await useDrizzle()
-    .insert(tables.users)
+  const user = await db
+    .insert(schema.users)
     .values({
       email: body.email,
       name: body.name,
@@ -67,8 +67,8 @@ export default defineEventHandler(async (event) => {
     .returning()
     .get()
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'user_created',

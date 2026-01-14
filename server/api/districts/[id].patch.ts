@@ -18,14 +18,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const district = await useDrizzle()
-    .update(tables.districts)
+  const district = await db
+    .update(schema.districts)
     .set({
       name: body.name,
       address: body.address,
       contactInfo: body.contactInfo
     })
-    .where(eq(tables.districts.id, id))
+    .where(eq(schema.districts.id, id))
     .returning()
     .get()
 
@@ -36,8 +36,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await useDrizzle()
-    .insert(tables.auditLogs)
+  await db
+    .insert(schema.auditLogs)
     .values({
       userId: session.user.id,
       action: 'district_updated',

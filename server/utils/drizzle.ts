@@ -1,4 +1,4 @@
-import * as schema from '../db/schema'
+import type * as schema from '../db/schema'
 
 export { sql, eq, and, or } from 'drizzle-orm'
 

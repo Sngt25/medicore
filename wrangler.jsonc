@@ -27,4 +27,12 @@
       "bucket_name": "medicore"
     }
   ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "$DurableObject",
+        "class_name": "$DurableObject"
+      }
+    ]
+  }
 }

@@ -27,4 +27,20 @@
       "bucket_name": "medicore"
     }
   ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHAT",
+        "class_name": "Chat"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "Chat"
+      ]
+    }
+  ]
 }

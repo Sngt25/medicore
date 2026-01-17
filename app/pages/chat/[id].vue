@@ -71,7 +71,10 @@ onChange(async (selectedFiles) => {
 // WebSocket connection
 const { status: wsStatus, send, open } = useWebSocket('/ws/chat', {
   immediate: false,
-  autoReconnect: true,
+  autoReconnect: {
+    retries: 3,
+    delay: 3000
+  },
   onConnected: (ws) => {
     console.log('WebSocket connected')
     ws.send(JSON.stringify({

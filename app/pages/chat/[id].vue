@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useFileDialog } from '@vueuse/core'
+import { useFileDialog, useWebSocket } from '@vueuse/core'
 
 const route = useRoute()
 const toast = useToast()
@@ -68,28 +68,18 @@ onChange(async (selectedFiles) => {
   }
 })
 
-// WebSocket connection - only initialize on client
-const wsStatus = ref<'CONNECTING' | 'OPEN' | 'CLOSED'>('CLOSED')
-const wsConnection = ref<WebSocket | null>(null)
-
-function initializeWebSocket() {
-  if (!import.meta.client) return
-
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const ws = new WebSocket(`${protocol}//${window.location.host}/ws/chat`)
-
-  ws.onopen = () => {
+// WebSocket connection
+const { status: wsStatus, send, open } = useWebSocket('/ws/chat', {
+  immediate: false,
+  autoReconnect: true,
+  onConnected: (ws) => {
     console.log('WebSocket connected')
-    wsStatus.value = 'OPEN'
-    ws.send(
-      JSON.stringify({
-        action: 'subscribe_chat',
-        chatId: chatId.value
-      })
-    )
-  }
-
-  ws.onmessage = (event) => {
+    ws.send(JSON.stringify({
+      action: 'subscribe_chat',
+      chatId: chatId.value
+    }))
+  },
+  onMessage: (ws, event) => {
     try {
       const message = JSON.parse(event.data)
       console.log('WebSocket message:', message)
@@ -102,24 +92,19 @@ function initializeWebSocket() {
     catch (error) {
       console.error('Failed to parse WebSocket message:', error)
     }
-  }
-
-  ws.onerror = (error) => {
+  },
+  onError: (_, error) => {
     console.error('WebSocket error:', error)
-  }
-
-  ws.onclose = () => {
+  },
+  onDisconnected: () => {
     console.log('WebSocket disconnected')
-    wsStatus.value = 'CLOSED'
   }
-
-  wsConnection.value = ws
-}
+})
 
 const messageDisplayTimes = ref<Record<string, string>>({})
 
 onMounted(() => {
-  initializeWebSocket()
+  open()
 
   if (chat.value?.messages) {
     chat.value.messages.forEach((message) => {
@@ -128,12 +113,6 @@ onMounted(() => {
         minute: '2-digit'
       })
     })
-  }
-})
-
-onUnmounted(() => {
-  if (wsConnection.value) {
-    wsConnection.value.close()
   }
 })
 
@@ -156,8 +135,8 @@ async function sendMessage() {
       }
     })
 
-    if (wsConnection.value && wsConnection.value.readyState === WebSocket.OPEN) {
-      wsConnection.value.send(
+    if (wsStatus.value === 'OPEN') {
+      send(
         JSON.stringify({
           action: 'broadcast_message',
           chatId: chatId.value,

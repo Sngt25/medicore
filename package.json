@@ -24,6 +24,7 @@
     "@nuxthub/core": "^0.10.4",
     "@unhead/vue": "^2.1.2",
     "@vercel/blob": "^2.0.0",
+    "@vueuse/core": "^14.1.0",
     "drizzle-orm": "^0.45.1",
     "nuxt": "^4.2.2",
     "nuxt-auth-utils": "0.5.27",

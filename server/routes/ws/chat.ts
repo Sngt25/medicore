@@ -1,18 +1,15 @@
 import { eq } from 'drizzle-orm'
 
-// WebSocket handler for real-time messaging
 export default defineWebSocketHandler({
   async upgrade(request) {
-    // Require authentication before upgrade
     await requireUserSession(request)
   },
 
   async open(peer) {
     const { user } = await requireUserSession(peer)
     console.log('[ws] User connected:', user.id, user.email)
-
-    // Store user info in peer context
-    peer.ctx = { userId: user.id, role: user.role, districtId: user.districtId }
+    // @ts-expect-error - Attach user to peer
+    peer.user = user
   },
 
   async message(peer, message) {
@@ -21,7 +18,6 @@ export default defineWebSocketHandler({
         typeof message === 'string' ? message : await message.text()
       )
       console.log('[ws] Message received:', data)
-
 
       if (data.action === 'subscribe_chat') {
         const chatId = data.chatId
@@ -43,18 +39,6 @@ export default defineWebSocketHandler({
           return
         }
 
-        const canAccess
-          = peer.ctx.role === 'admin'
-            || chat.patientId === peer.ctx.userId
-            || (peer.ctx.role === 'healthcare_worker'
-              && chat.districtId === peer.ctx.districtId)
-
-        if (!canAccess) {
-          peer.send(JSON.stringify({ error: 'Forbidden' }))
-          return
-        }
-
-        // Subscribe to chat channel
         peer.subscribe(`chat:${chatId}`)
         peer.send(
           JSON.stringify({
@@ -78,8 +62,9 @@ export default defineWebSocketHandler({
         }
       }
       else if (data.action === 'subscribe_district_queue') {
-        // Healthcare workers subscribe to their district queue
-        if (peer.ctx.role !== 'healthcare_worker' || !peer.ctx.districtId) {
+        const { user } = await requireUserSession(peer)
+
+        if (user.role !== 'healthcare_worker' || !user.districtId) {
           peer.send(
             JSON.stringify({
               error: 'Must be healthcare worker with assigned district'
@@ -88,17 +73,16 @@ export default defineWebSocketHandler({
           return
         }
 
-        peer.subscribe(`district:${peer.ctx.districtId}:queue`)
+        peer.subscribe(`district:${user.districtId}:queue`)
         peer.send(
           JSON.stringify({
             type: 'subscribed_queue',
-            districtId: peer.ctx.districtId,
+            districtId: user.districtId,
             timestamp: new Date().toISOString()
           })
         )
       }
       else if (data.action === 'broadcast_message') {
-        // Broadcast message to chat channel (called after message is persisted)
         const chatId = data.chatId
         const messageData = data.message
 
@@ -122,10 +106,12 @@ export default defineWebSocketHandler({
   },
 
   close(peer) {
-    console.log('[ws] User disconnected:', peer.ctx?.userId)
+    // @ts-expect-error - User attached in open
+    console.log('[ws] User disconnected:', peer.user?.id)
   },
 
   error(peer, error) {
-    console.error('[ws] WebSocket error for user', peer.ctx?.userId, ':', error)
+    // @ts-expect-error - User attached in open
+    console.error('[ws] WebSocket error for user', peer.user?.id, ':', error)
   }
 })

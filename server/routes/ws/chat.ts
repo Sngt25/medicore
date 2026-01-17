@@ -1,10 +1,6 @@
 import { eq } from 'drizzle-orm'
 
 export default defineWebSocketHandler({
-  async upgrade(request) {
-    await requireUserSession(request)
-  },
-
   async open(peer) {
     const { user } = await requireUserSession(peer)
     console.log('[ws] User connected:', user.id, user.email)

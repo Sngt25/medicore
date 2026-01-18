@@ -5,6 +5,14 @@ const activeTab = ref('queue')
 const showAcceptDialog = ref(false)
 const { user } = useUserSession()
 
+const { data: currentDistrict } = await useFetch<unknown>(
+  '/api/districts',
+  {
+    query: { id: computed(() => user.value?.districtId) },
+    key: 'current-district'
+  }
+)
+
 interface ChatType {
   id: string
   patientId: string
@@ -164,6 +172,17 @@ async function closeChat(chatId: string) {
       <UDashboardNavbar title="Healthcare Worker Dashboard">
         <template #leading>
           <UDashboardSidebarCollapse />
+        </template>
+        <template #trailing>
+          <UBadge
+            v-if="currentDistrict"
+            color="primary"
+            variant="subtle"
+            class="hidden sm:inline-flex"
+            icon="i-heroicons-building-office-2"
+          >
+            {{ currentDistrict.name }}
+          </UBadge>
         </template>
       </UDashboardNavbar>
     </template>

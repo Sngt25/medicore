@@ -1,13 +1,6 @@
 import { eq } from 'drizzle-orm'
 
 export default defineOAuthGoogleEventHandler({
-  // config: {
-  //   scope: ['email', 'profile', 'openid'],
-  //   authorizationParams: {
-  //     access_type: 'offline',
-  //     prompt: 'consent'
-  //   }
-  // },
   async onSuccess(event, { user }) {
     const config = useRuntimeConfig(event)
 
@@ -67,7 +60,7 @@ export default defineOAuthGoogleEventHandler({
     if (dbUser?.role === 'admin') {
       return sendRedirect(event, '/admin')
     }
-    else if (dbUser?.role === 'healthcare_worker') {
+    else if (dbUser?.role === 'healthcare_worker' && dbUser?.districtId) {
       return sendRedirect(event, '/dashboard')
     }
     else {

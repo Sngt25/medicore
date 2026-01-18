@@ -13,7 +13,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return navigateTo('/admin')
     }
   }
-  else if (loggedIn.value && user.value?.role === 'healthcare_worker') {
+  else if (loggedIn.value && user.value?.role === 'healthcare_worker' && user.value?.districtId) {
     if (to.path !== '/dashboard') {
       return navigateTo('/dashboard')
     }

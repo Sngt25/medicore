@@ -32,7 +32,7 @@ definePageMeta({
           class="space-y-4"
         >
           <UButton
-            color="white"
+            color="primary"
             block
             size="lg"
             external

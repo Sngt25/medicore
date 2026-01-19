@@ -193,17 +193,6 @@ const statusColor = computed(() => {
   }
 })
 
-const wsStatusColor = computed(() => {
-  switch (wsStatus.value) {
-    case 'OPEN':
-      return 'success'
-    case 'CONNECTING':
-      return 'warning'
-    default:
-      return 'error'
-  }
-})
-
 function getMessageTime(message: { id: string, createdAt: string }) {
   const isoTime = new Date(message.createdAt).toISOString().split('T')[1]
   return messageDisplayTimes.value[message.id] || (isoTime ? isoTime.substring(0, 5) : '')
@@ -302,15 +291,6 @@ async function closeChat() {
                   {{ chat?.status }}
                 </UBadge>
                 <span v-if="chat?.district?.name">{{ chat.district.name }}</span>
-                <ClientOnly>
-                  <UBadge
-                    :color="wsStatusColor"
-                    size="xs"
-                    variant="subtle"
-                  >
-                    {{ wsStatus }}
-                  </UBadge>
-                </ClientOnly>
               </div>
             </div>
           </div>

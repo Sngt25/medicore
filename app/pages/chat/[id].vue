@@ -81,8 +81,9 @@ onMounted(() => {
       scrollToBottom()
     })
     
-    chatChannel.bind('chat_updated', () => {
-      refreshChat()
+    chatChannel.bind('chat_updated', async () => {
+      await refreshChat()
+      await refreshNuxtData('chats-list')
     })
   }
 
@@ -221,6 +222,7 @@ async function acceptChat() {
 
     showAcceptModal.value = false
     await refreshChat()
+    await refreshNuxtData('chats-list')
   }
   catch (error) {
     toast.add({
@@ -246,6 +248,7 @@ async function closeChat() {
 
     showCloseModal.value = false
     await refreshChat()
+    await refreshNuxtData('chats-list')
   }
   catch (error) {
     toast.add({

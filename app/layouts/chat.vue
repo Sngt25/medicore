@@ -6,6 +6,7 @@ provide('chatSidebarOpen', isMobileSidebarOpen)
 const selectedDistrict = useSelectedDistrict()
 
 const { data: chats } = await useFetch<ChatX[]>('/api/chats', {
+  key: 'chats-list',
   query: computed(() => ({
     districtId: selectedDistrict.value || undefined
   }))
@@ -15,6 +16,25 @@ const { data: districts } = await useFetch<District[]>('/api/districts')
 
 const route = useRoute()
 const currentChatId = computed(() => route.params.id as string || undefined)
+
+const { user } = useUserSession()
+const { subscribe, unsubscribe } = usePusher()
+
+onMounted(() => {
+  if (user.value?.role === 'healthcare_worker' && user.value.districtId) {
+    const channel = subscribe(`district-${user.value.districtId}-queue`)
+    if (channel) {
+      channel.bind('new_chat', () => refreshNuxtData('chats-list'))
+      channel.bind('chat_updated', () => refreshNuxtData('chats-list'))
+    }
+  }
+})
+
+onUnmounted(() => {
+  if (user.value?.role === 'healthcare_worker' && user.value.districtId) {
+    unsubscribe(`district-${user.value.districtId}-queue`)
+  }
+})
 </script>
 
 <template>

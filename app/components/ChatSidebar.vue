@@ -33,17 +33,19 @@ function formatChatDate(dateString: Date | string) {
 
 const displayDates = ref<Record<string, string>>({})
 
-onMounted(() => {
-  if (props.chats) {
-    props.chats.forEach((chat) => {
-      displayDates.value[chat.id] = new Date(chat.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
+watch(() => props.chats, (newChats) => {
+  if (newChats) {
+    newChats.forEach((chat) => {
+      if (!displayDates.value[chat.id]) {
+        displayDates.value[chat.id] = new Date(chat.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+      }
     })
   }
-})
+}, { immediate: true })
 
 const isMobileSidebarOpen = inject<Ref<boolean>>('chatSidebarOpen')
 

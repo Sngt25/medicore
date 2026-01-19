@@ -54,6 +54,7 @@ async function createChat() {
       color: 'primary'
     })
 
+    await refreshNuxtData('chats-list')
     router.push(`/chat/${chat.id}`)
   }
   catch (error: any) {

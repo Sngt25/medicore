@@ -29,6 +29,7 @@ export default defineOAuthGoogleEventHandler({
           email: user.email,
           name: user.name || user.email,
           googleSub: user.sub,
+          avatar: user.picture,
           role: isAdmin ? 'admin' : 'patient',
           verified: true
         })
@@ -41,6 +42,13 @@ export default defineOAuthGoogleEventHandler({
         action: 'user_created',
         detail: { method: 'google_oauth', role: dbUser.role }
       })
+    }
+    else {
+      await db
+        .update(schema.users)
+        .set({ avatar: user.picture })
+        .where(eq(schema.users.id, existingUser.id))
+        .run()
     }
 
     // Set user session

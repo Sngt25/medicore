@@ -12,6 +12,7 @@ export const users = sqliteTable('users', {
   }).default('patient'),
   districtId: text('district_id'),
   googleSub: text('google_sub').notNull().unique(),
+  avatar: text('avatar'),
   verified: integer('verified', { mode: 'boolean' }).default(false).notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()

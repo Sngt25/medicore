@@ -279,6 +279,10 @@ async function closeChat() {
               square
               class="hidden lg:inline-flex"
             />
+            <UAvatar
+              :src="user?.role === 'healthcare_worker' ? chat?.patient?.avatar : chat?.assignedWorker?.avatar"
+              :alt="user?.role === 'healthcare_worker' ? (chat?.patient?.name || 'Patient') : (chat?.assignedWorker?.name || 'Waiting...')"
+            />
             <div>
               <h1 class="font-semibold">
                 {{ user?.role === 'healthcare_worker' ? (chat?.patient?.name || 'Patient') : (chat?.assignedWorker?.name || 'Waiting for healthcare worker...') }}

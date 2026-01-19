@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
             id: schema.users.id,
             name: schema.users.name,
             email: schema.users.email,
-            avatar: sql<string>`'https://avatar.vercel.sh/' || ${schema.users.email}`
+            avatar: schema.users.avatar
           })
           .from(schema.users)
           .where(eq(schema.users.id, chat.patientId))

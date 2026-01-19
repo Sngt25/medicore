@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import type { Channel } from 'pusher-js'
+
 const toast = useToast()
-const ws = ref<WebSocket | null>(null)
+const { subscribe, unsubscribe } = usePusher()
 const activeTab = ref('queue')
 const showAcceptDialog = ref(false)
 const { user } = useUserSession()
+let queueChannel: Channel | null | undefined = null
 
 const { data: currentDistrict } = await useFetch<unknown>(
   '/api/districts',
@@ -56,49 +59,47 @@ definePageMeta({
 
 // Watch for district changes and refresh all chats
 watch(() => user.value?.districtId, async (newDistrictId, oldDistrictId) => {
-  if (newDistrictId && newDistrictId !== oldDistrictId) {
-    console.log('District changed, refreshing chats...')
-    await Promise.all([refreshQueue(), refreshActive(), refreshClosed()])
+  if (oldDistrictId) {
+    unsubscribe(`district-${oldDistrictId}-queue`)
+  }
+
+  if (newDistrictId) {
+    if (newDistrictId !== oldDistrictId) {
+      console.log('District changed, refreshing chats...')
+      setupRealtime()
+      await Promise.all([refreshQueue(), refreshActive(), refreshClosed()])
+    }
   }
 }, { immediate: false })
 
 onMounted(() => {
-  connectWebSocket()
+  setupRealtime()
 })
 
 onUnmounted(() => {
-  if (ws.value) {
-    ws.value.close()
+  if (user.value?.districtId) {
+    unsubscribe(`district-${user.value.districtId}-queue`)
   }
 })
 
-function connectWebSocket() {
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  ws.value = new WebSocket(`${protocol}//${window.location.host}/ws/chat`)
+function setupRealtime() {
+  if (!user.value?.districtId) return
 
-  ws.value.onopen = () => {
-    console.log('WebSocket connected')
-    // Subscribe to district queue updates (worker will receive all districts they handle)
-  }
+  const channelName = `district-${user.value.districtId}-queue`
+  queueChannel = subscribe(channelName)
 
-  ws.value.onmessage = (event) => {
-    const data = JSON.parse(event.data)
-    console.log('WebSocket message:', data)
-
-    if (data.type === 'new_chat' || data.type === 'chat_assigned') {
+  if (queueChannel) {
+    queueChannel.bind('new_chat', () => {
       refreshQueue()
       refreshActive()
       refreshClosed()
-    }
-  }
+    })
 
-  ws.value.onerror = (error) => {
-    console.error('WebSocket error:', error)
-  }
-
-  ws.value.onclose = () => {
-    console.log('WebSocket disconnected')
-    setTimeout(connectWebSocket, 3000)
+    queueChannel.bind('chat_updated', () => {
+      refreshQueue()
+      refreshActive()
+      refreshClosed()
+    })
   }
 }
 

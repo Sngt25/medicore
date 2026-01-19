@@ -28,6 +28,8 @@
     "drizzle-orm": "^0.45.1",
     "nuxt": "^4.2.2",
     "nuxt-auth-utils": "0.5.27",
+    "pusher": "^5.3.2",
+    "pusher-js": "^8.4.0",
     "tailwindcss": "^4.1.18",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"

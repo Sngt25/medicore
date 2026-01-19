@@ -83,5 +83,11 @@ export default defineEventHandler(async (event) => {
     })
     .run()
 
+  await pusherServer.trigger(`chat-${updatedChat.id}`, 'chat_updated', updatedChat)
+
+  if (updatedChat.districtId) {
+    await pusherServer.trigger(`district-${updatedChat.districtId}-queue`, 'chat_updated', updatedChat)
+  }
+
   return updatedChat
 })

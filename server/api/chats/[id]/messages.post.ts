@@ -77,5 +77,10 @@ export default defineEventHandler(async (event) => {
     .returning()
     .get()
 
+  await pusherServer.trigger(`chat-${chatId}`, 'new_message', {
+    ...message,
+    type: 'new_message'
+  })
+
   return message
 })

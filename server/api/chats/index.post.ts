@@ -41,5 +41,10 @@ export default defineEventHandler(async (event) => {
       detail: { chatId: chat.id, districtId: body.districtId }
     })
 
+  await pusherServer.trigger(`district-${body.districtId}-queue`, 'new_chat', {
+    ...chat,
+    type: 'new_chat'
+  })
+
   return chat
 })

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { useFileDialog, useWebSocket } from '@vueuse/core'
+import { useFileDialog } from '@vueuse/core'
+import type { Channel } from 'pusher-js'
 
 const route = useRoute()
 const toast = useToast()
 const { user } = useUserSession()
+const { subscribe, unsubscribe } = usePusher()
 
 const chatId = computed(() => route.params.id as string)
 const messageBody = ref('')
@@ -12,6 +14,7 @@ const uploadedFiles = ref<string[]>([])
 const isUploading = ref(false)
 const showAcceptModal = ref(false)
 const showCloseModal = ref(false)
+let chatChannel: Channel | null | undefined = null
 
 const { data: chat, refresh: refreshChat } = await useFetch<ChatX>(
   `/api/chats/${chatId.value}`
@@ -68,46 +71,20 @@ onChange(async (selectedFiles) => {
   }
 })
 
-// WebSocket connection
-const { status: wsStatus, send, open } = useWebSocket('/ws/chat', {
-  immediate: false,
-  autoReconnect: {
-    retries: 3,
-    delay: 3000
-  },
-  onConnected: (ws) => {
-    console.log('WebSocket connected')
-    ws.send(JSON.stringify({
-      action: 'subscribe_chat',
-      chatId: chatId.value
-    }))
-  },
-  onMessage: (ws, event) => {
-    try {
-      const message = JSON.parse(event.data)
-      console.log('WebSocket message:', message)
-
-      if (message.type === 'new_message') {
-        refreshChat()
-        scrollToBottom()
-      }
-    }
-    catch (error) {
-      console.error('Failed to parse WebSocket message:', error)
-    }
-  },
-  onError: (_, error) => {
-    console.error('WebSocket error:', error)
-  },
-  onDisconnected: () => {
-    console.log('WebSocket disconnected')
-  }
-})
-
-const messageDisplayTimes = ref<Record<string, string>>({})
-
+// Realtime connection
 onMounted(() => {
-  open()
+  chatChannel = subscribe(`chat-${chatId.value}`)
+  
+  if (chatChannel) {
+    chatChannel.bind('new_message', () => {
+      refreshChat()
+      scrollToBottom()
+    })
+    
+    chatChannel.bind('chat_updated', () => {
+      refreshChat()
+    })
+  }
 
   if (chat.value?.messages) {
     chat.value.messages.forEach((message) => {
@@ -118,6 +95,14 @@ onMounted(() => {
     })
   }
 })
+
+onUnmounted(() => {
+  if (chatChannel) {
+    unsubscribe(`chat-${chatId.value}`)
+  }
+})
+
+const messageDisplayTimes = ref<Record<string, string>>({})
 
 async function sendMessage() {
   if (!messageBody.value.trim() && uploadedFiles.value.length === 0)
@@ -137,16 +122,6 @@ async function sendMessage() {
         attachments: attachments.length > 0 ? attachments : undefined
       }
     })
-
-    if (wsStatus.value === 'OPEN') {
-      send(
-        JSON.stringify({
-          action: 'broadcast_message',
-          chatId: chatId.value,
-          message
-        })
-      )
-    }
 
     await refreshChat()
     scrollToBottom()

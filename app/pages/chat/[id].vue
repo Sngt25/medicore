@@ -281,7 +281,7 @@ async function closeChat() {
             />
             <div>
               <h1 class="font-semibold">
-                {{ chat?.assignedWorker?.name || 'Waiting for healthcare worker...' }}
+                {{ user?.role === 'healthcare_worker' ? (chat?.patient?.name || 'Patient') : (chat?.assignedWorker?.name || 'Waiting for healthcare worker...') }}
               </h1>
               <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <UBadge

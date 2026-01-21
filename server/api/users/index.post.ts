@@ -46,6 +46,38 @@ export default defineEventHandler(async (event) => {
     .get()
 
   if (existingUser) {
+    if (existingUser.role === 'patient' && body.role === 'healthcare_worker') {
+      const updatedUser = await db
+        .update(schema.users)
+        .set({
+          role: 'healthcare_worker',
+          districtId: body.districtId || null,
+          verified: true
+        })
+        .where(eq(schema.users.id, existingUser.id))
+        .returning()
+        .get()
+
+      await db
+        .insert(schema.auditLogs)
+        .values({
+          userId: session.user.id,
+          action: 'user_promoted',
+          detail: { userId: updatedUser.id, role: updatedUser.role }
+        })
+        .run()
+
+      return {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        role: updatedUser.role,
+        districtId: updatedUser.districtId,
+        verified: updatedUser.verified,
+        createdAt: updatedUser.createdAt
+      }
+    }
+
     throw createError({
       statusCode: 409,
       message: 'Email already exists'

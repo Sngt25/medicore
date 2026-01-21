@@ -51,6 +51,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (user.role === 'healthcare_worker') {
+    await db
+      .update(schema.users)
+      .set({
+        role: 'patient',
+        districtId: null
+      })
+      .where(eq(schema.users.id, id))
+      .run()
+
+    await db
+      .insert(schema.auditLogs)
+      .values({
+        userId: session.user.id,
+        action: 'user_demoted',
+        detail: { userId: id, userEmail: user.email }
+      })
+      .run()
+
+    return { success: true }
+  }
+
   await db.delete(schema.users).where(eq(schema.users.id, id)).run()
 
   await db

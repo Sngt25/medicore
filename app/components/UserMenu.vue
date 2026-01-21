@@ -131,7 +131,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
       label: 'Logout',
       icon: 'i-heroicons-arrow-right-on-rectangle',
       onSelect: async () => {
-        clear()
+        await clear()
         return navigateTo('/')
       }
     }

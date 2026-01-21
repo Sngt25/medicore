@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { data: districts, status } = await useFetch<District[]>('/api/districts')
-const { user, fetch } = useUserSession()
+const { user, fetch, clear } = useUserSession()
 const toast = useToast()
 
 definePageMeta({
@@ -44,7 +44,7 @@ async function selectDistrict(districtId: string) {
 }
 
 const logout = async () => {
-  useUserSession().clear()
+  await clear()
   return navigateTo('/')
 }
 </script>

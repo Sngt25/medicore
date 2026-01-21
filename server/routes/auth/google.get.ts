@@ -13,35 +13,53 @@ export default defineOAuthGoogleEventHandler({
 
     let dbUser = existingUser
 
-    // Create user if doesn't exist
-    if (!existingUser) {
-      const adminEmailsStr = String(config.public.adminEmails || '')
-      const adminEmails = adminEmailsStr
-        .split(',')
-        .map((e: string) => e.trim())
-        .filter(Boolean)
-
-      const isAdmin = adminEmails.includes(user.email)
-
-      dbUser = await db
-        .insert(schema.users)
-        .values({
-          email: user.email,
-          name: user.name || user.email,
-          googleSub: user.sub,
-          avatar: user.picture,
-          role: isAdmin ? 'admin' : 'patient',
-          verified: true
-        })
-        .returning()
+    if (!dbUser) {
+      const existingUserByEmail = await db
+        .select()
+        .from(schema.users)
+        .where(eq(schema.users.email, user.email))
         .get()
 
-      // Log user creation
-      await db.insert(schema.auditLogs).values({
-        userId: dbUser.id,
-        action: 'user_created',
-        detail: { method: 'google_oauth', role: dbUser.role }
-      })
+      if (existingUserByEmail) {
+        dbUser = await db
+          .update(schema.users)
+          .set({
+            googleSub: user.sub,
+            avatar: user.picture,
+            verified: true
+          })
+          .where(eq(schema.users.id, existingUserByEmail.id))
+          .returning()
+          .get()
+      }
+      else {
+        const adminEmailsStr = String(config.public.adminEmails || '')
+        const adminEmails = adminEmailsStr
+          .split(',')
+          .map((e: string) => e.trim())
+          .filter(Boolean)
+
+        const isAdmin = adminEmails.includes(user.email)
+
+        dbUser = await db
+          .insert(schema.users)
+          .values({
+            email: user.email,
+            name: user.name || user.email,
+            googleSub: user.sub,
+            avatar: user.picture,
+            role: isAdmin ? 'admin' : 'patient',
+            verified: true
+          })
+          .returning()
+          .get()
+
+        await db.insert(schema.auditLogs).values({
+          userId: dbUser.id,
+          action: 'user_created',
+          detail: { method: 'google_oauth', role: dbUser.role }
+        })
+      }
     }
     else {
       await db

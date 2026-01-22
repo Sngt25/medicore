@@ -1,6 +1,6 @@
 import type * as schema from '../db/schema'
 
-export { sql, eq, and, or } from 'drizzle-orm'
+export { sql, eq, and, or, desc } from 'drizzle-orm'
 
 export type User = typeof schema.users.$inferSelect
 export type District = typeof schema.districts.$inferSelect

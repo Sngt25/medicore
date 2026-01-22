@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       .select()
       .from(schema.chats)
       .where(and(...conditions))
-      .orderBy(schema.chats.createdAt)
+      .orderBy(desc(schema.chats.createdAt))
       .all()
   }
   else if (session.user.role === 'patient') {
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
       .select()
       .from(schema.chats)
       .where(and(...conditions))
-      .orderBy(schema.chats.createdAt)
+      .orderBy(desc(schema.chats.createdAt))
       .all()
   }
   else if (session.user.role === 'admin') {
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
       .select()
       .from(schema.chats)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(schema.chats.createdAt)
+      .orderBy(desc(schema.chats.createdAt))
       .all()
   }
   else {

@@ -297,6 +297,14 @@ async function closeChat() {
                 >
                   {{ chat?.status }}
                 </UBadge>
+                <UBadge
+                  v-if="user?.role === 'healthcare_worker' || chat?.assignedWorker"
+                  color="secondary"
+                  variant="subtle"
+                  size="xs"
+                >
+                  {{ user?.role === 'healthcare_worker' ? 'Patient' : 'Healthcare Worker' }}
+                </UBadge>
                 <span v-if="chat?.district?.name">{{ chat.district.name }}</span>
               </div>
             </div>

@@ -47,6 +47,13 @@ watch(() => props.chats, (newChats) => {
   }
 }, { immediate: true })
 
+const sortedChats = computed(() => {
+  if (!props.chats) return []
+  return [...props.chats].sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+})
+
 const isMobileSidebarOpen = inject<Ref<boolean>>('chatSidebarOpen')
 
 function closeMobileSidebar() {
@@ -103,7 +110,7 @@ function closeMobileSidebar() {
       class="space-y-2"
     >
       <UCard
-        v-for="chat in chats"
+        v-for="chat in sortedChats"
         :key="chat.id"
         class="cursor-pointer hover:ring-2 hover:ring-primary transition-all"
         :class="{

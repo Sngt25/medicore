@@ -12,15 +12,16 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const conditions = [eq(schema.chats.districtId, session.user.districtId)]
+    const conditions = [
+      eq(schema.chats.districtId, session.user.districtId),
+      or(
+        eq(schema.chats.status, 'queued'),
+        eq(schema.chats.assignedWorkerId, session.user.id)
+      )
+    ]
 
     if (query.status) {
       conditions.push(eq(schema.chats.status, query.status as 'queued' | 'active' | 'closed'))
-
-      // For active and closed chats, only show chats assigned to this worker
-      if (query.status === 'active' || query.status === 'closed') {
-        conditions.push(eq(schema.chats.assignedWorkerId, session.user.id))
-      }
     }
 
     chats = await db

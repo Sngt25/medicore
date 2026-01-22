@@ -26,7 +26,8 @@ export default defineEventHandler(async (event) => {
     = session.user.role === 'admin'
       || chat.patientId === session.user.id
       || (session.user.role === 'healthcare_worker'
-        && chat.districtId === session.user.districtId)
+        && chat.districtId === session.user.districtId
+        && (chat.status === 'queued' || chat.assignedWorkerId === session.user.id))
 
   if (!canAccess) {
     throw createError({

@@ -39,17 +39,16 @@ const items: NavigationMenuItem[][] = [
       <template #header="{ collapsed }">
         <ULink
           to="/"
-          class="flex items-center gap-2"
         >
-          <UIcon
-            name="i-heroicons-heart"
-            class="size-6 text-primary"
-          />
           <span
             v-if="!collapsed"
-            class="font-semibold text-lg"
+            class="font-semibold text-lg flex items-center"
           >
-            MediCore
+            MED<img
+              src="/images/medicore-logo.png"
+              class="h-[2em] w-auto mx-px"
+              alt="i"
+            >CORE
           </span>
         </ULink>
       </template>

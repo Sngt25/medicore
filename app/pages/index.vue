@@ -11,8 +11,12 @@ definePageMeta({
     <UCard class="max-w-md w-full">
       <template #header>
         <div class="flex items-center justify-center">
-          <h1 class="text-2xl font-bold">
-            Medicore
+          <h1 class="text-2xl font-bold flex items-center">
+            MED<img
+              src="/images/medicore-logo.png"
+              class="h-[2em] w-auto mx-px"
+              alt="i"
+            >CORE
           </h1>
         </div>
       </template>

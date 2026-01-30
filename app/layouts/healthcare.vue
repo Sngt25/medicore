@@ -13,13 +13,6 @@ const items: NavigationMenuItem[][] = [
       icon: 'i-heroicons-clipboard-document-list',
       to: '/dashboard/tasks'
     }
-  ],
-  [
-    {
-      label: 'Districts',
-      icon: 'i-heroicons-building-office-2',
-      to: '/districts'
-    }
   ]
 ]
 </script>
@@ -53,13 +46,6 @@ const items: NavigationMenuItem[][] = [
           :collapsed="collapsed"
           :items="items[0]"
           orientation="vertical"
-        />
-
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="items[1]"
-          orientation="vertical"
-          class="mt-auto"
         />
       </template>
 

@@ -3,6 +3,10 @@ const { data: districts, status } = await useFetch<District[]>('/api/districts')
 const { user, fetch, clear } = useUserSession()
 const toast = useToast()
 
+if (user.value?.role === 'healthcare_worker' && user.value?.districtId) {
+  navigateTo('/dashboard')
+}
+
 definePageMeta({
   middleware: 'auth'
 })

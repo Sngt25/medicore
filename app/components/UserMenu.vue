@@ -8,6 +8,7 @@ defineProps<{
 const { user, clear } = useUserSession()
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
+const { fontSize, options: fontSizes } = useFontSize()
 
 const colors = [
   'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald',
@@ -124,6 +125,19 @@ const items = computed<DropdownMenuItem[][]>(() => [
           }
         }
       ]
+    },
+    {
+      label: 'Font Size',
+      icon: 'i-heroicons-magnifying-glass-plus',
+      children: fontSizes.map(size => ({
+        label: size.label,
+        type: 'checkbox',
+        checked: fontSize.value === size.value,
+        onSelect: (e: Event) => {
+          e.preventDefault()
+          fontSize.value = size.value
+        }
+      }))
     }
   ],
   [

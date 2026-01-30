@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { loggedIn } = useUserSession()
+const { fontSize, options: fontSizes } = useFontSize()
 
 definePageMeta({
   middleware: 'guest'
@@ -54,6 +55,21 @@ definePageMeta({
           <p class="text-sm text-center text-gray-500">
             By signing in, you agree to our terms of service
           </p>
+
+          <USeparator label="Text Size" />
+
+          <div class="flex justify-center gap-2">
+            <UButton
+              v-for="size in fontSizes"
+              :key="size.value"
+              :color="fontSize === size.value ? 'primary' : 'secondary'"
+              :variant="fontSize === size.value ? 'solid' : 'ghost'"
+              size="sm"
+              @click="fontSize = size.value"
+            >
+              {{ size.label }}
+            </UButton>
+          </div>
         </div>
       </div>
     </UCard>

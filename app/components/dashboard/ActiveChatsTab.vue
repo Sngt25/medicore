@@ -15,7 +15,7 @@ interface Props {
 defineProps<Props>()
 
 const emit = defineEmits<{
-  close: [chatId: string]
+  (e: 'task-created'): void
 }>()
 </script>
 
@@ -57,14 +57,6 @@ const emit = defineEmits<{
               variant="outline"
               label="Task"
             />
-            <UButton
-              color="neutral"
-              variant="outline"
-              size="sm"
-              @click="emit('close', chat.id)"
-            >
-              Close
-            </UButton>
           </div>
         </div>
 

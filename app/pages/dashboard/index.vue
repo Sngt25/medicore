@@ -163,7 +163,7 @@ async function acceptChat() {
     <template #body>
       <div class="space-y-6">
         <!-- Stats -->
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-2">
           <UCard>
             <div class="flex items-center gap-3">
               <div class="p-3 bg-amber-100 dark:bg-amber-900 rounded-lg">

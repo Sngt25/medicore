@@ -7,6 +7,26 @@ const props = defineProps<{
 
 const { user } = useUserSession()
 
+const filteredChats = computed(() => {
+  if (!props.chats) return []
+
+  let items = props.chats.filter(c => c.status !== 'closed')
+
+  if (user.value?.role === 'healthcare_worker') {
+    const activePatientIds = new Set(
+      items.filter(c => c.status === 'active').map(c => c.patientId)
+    )
+    items = items.filter(c => {
+      if (c.status === 'queued') {
+        return !activePatientIds.has(c.patientId)
+      }
+      return true
+    })
+  }
+
+  return items
+})
+
 const districtPrefixes = computed(() => {
   const prefixMap: Record<string, string> = {}
   const prefixes = ['BHD-', 'EHD-', 'WHD-']
@@ -33,7 +53,7 @@ function formatChatDate(dateString: Date | string) {
 
 const displayDates = ref<Record<string, string>>({})
 
-watch(() => props.chats, (newChats) => {
+watch(filteredChats, (newChats) => {
   if (newChats) {
     newChats.forEach((chat) => {
       if (!displayDates.value[chat.id]) {
@@ -83,7 +103,7 @@ function closeMobileSidebar() {
     </UButton>
 
     <div
-      v-if="!chats || chats.length === 0"
+      v-if="!filteredChats || filteredChats.length === 0"
       class="text-center py-8 text-gray-500"
     >
       <UIcon
@@ -91,7 +111,7 @@ function closeMobileSidebar() {
         class="w-12 h-12 mx-auto mb-3 opacity-50"
       />
       <p class="text-sm">
-        No chat history yet
+        No active chats
       </p>
       <p class="text-xs mt-1">
         Start your first conversation
@@ -103,7 +123,7 @@ function closeMobileSidebar() {
       class="space-y-2"
     >
       <UCard
-        v-for="chat in chats"
+        v-for="chat in filteredChats"
         :key="chat.id"
         class="cursor-pointer hover:ring-2 hover:ring-primary transition-all"
         :class="{
@@ -120,7 +140,7 @@ function closeMobileSidebar() {
               getChatLabel(chat)
             }}</span>
             <UBadge
-              :color="chat.status === 'active' ? 'primary' : chat.status === 'queued' ? 'warning' : 'secondary'"
+              :color="chat.status === 'active' ? 'primary' : 'warning'"
               size="xs"
             >
               {{ chat.status }}

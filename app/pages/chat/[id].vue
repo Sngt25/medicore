@@ -13,7 +13,6 @@ const messagesContainer = ref<HTMLElement>()
 const uploadedFiles = ref<string[]>([])
 const isUploading = ref(false)
 const showAcceptModal = ref(false)
-const showCloseModal = ref(false)
 let chatChannel: Channel | null | undefined = null
 
 const { data: chat, refresh: refreshChat } = await useFetch<ChatX>(
@@ -232,32 +231,6 @@ async function acceptChat() {
     })
   }
 }
-
-async function closeChat() {
-  try {
-    await $fetch(`/api/chats/${chatId.value}`, {
-      method: 'PATCH',
-      body: { status: 'closed' }
-    })
-
-    toast.add({
-      title: 'Success',
-      description: 'Chat closed successfully',
-      color: 'success'
-    })
-
-    showCloseModal.value = false
-    await refreshChat()
-    await refreshNuxtData('chats-list')
-  }
-  catch (error) {
-    toast.add({
-      title: 'Error',
-      description: (error as { data?: { message?: string } }).data?.message || 'Failed to close chat',
-      color: 'error'
-    })
-  }
-}
 </script>
 
 <template>
@@ -320,16 +293,6 @@ async function closeChat() {
                 @click="showAcceptModal = true"
               >
                 Accept
-              </UButton>
-              <UButton
-                v-else-if="chat?.status === 'active'"
-                color="error"
-                variant="soft"
-                icon="i-heroicons-x-mark"
-                size="sm"
-                @click="showCloseModal = true"
-              >
-                Close
               </UButton>
             </div>
           </div>
@@ -527,13 +490,6 @@ async function closeChat() {
       :chat="chat || null"
       @accept="acceptChat"
       @cancel="showAcceptModal = false"
-    />
-
-    <DashboardCloseChatModal
-      v-model="showCloseModal"
-      :chat="chat || null"
-      @close="closeChat"
-      @cancel="showCloseModal = false"
     />
   </div>
 </template>

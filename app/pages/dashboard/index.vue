@@ -28,7 +28,7 @@ interface ChatType {
 
 const selectedChat = ref<ChatType | null>(null)
 
-const { data: queuedChats, refresh: refreshQueue } = await useFetch<ChatType[]>(
+const { data: rawQueuedChats, refresh: refreshQueue } = await useFetch<ChatType[]>(
   '/api/chats',
   {
     query: { status: 'queued' },
@@ -44,13 +44,13 @@ const { data: activeChats, refresh: refreshActive } = await useFetch<ChatType[]>
   }
 )
 
-const { data: closedChats, refresh: refreshClosed } = await useFetch<ChatType[]>(
-  '/api/chats',
-  {
-    query: { status: 'closed' },
-    key: 'closed-chats'
-  }
-)
+const queuedChats = computed(() => {
+  const queue = rawQueuedChats.value || []
+  const active = activeChats.value || []
+  
+  const activePatientIds = new Set(active.map(c => c.patientId))
+  return queue.filter(c => !activePatientIds.has(c.patientId))
+})
 
 definePageMeta({
   middleware: 'healthcare',
@@ -67,7 +67,7 @@ watch(() => user.value?.districtId, async (newDistrictId, oldDistrictId) => {
     if (newDistrictId !== oldDistrictId) {
       console.log('District changed, refreshing chats...')
       setupRealtime()
-      await Promise.all([refreshQueue(), refreshActive(), refreshClosed()])
+      await Promise.all([refreshQueue(), refreshActive()])
     }
   }
 }, { immediate: false })
@@ -92,13 +92,11 @@ function setupRealtime() {
     queueChannel.bind('new_chat', () => {
       refreshQueue()
       refreshActive()
-      refreshClosed()
     })
 
     queueChannel.bind('chat_updated', () => {
       refreshQueue()
       refreshActive()
-      refreshClosed()
     })
   }
 }
@@ -135,32 +133,6 @@ async function acceptChat() {
       title: 'Error',
       description:
         error instanceof Error ? error.message : 'Failed to accept chat',
-      color: 'error'
-    })
-  }
-}
-
-// Close a chat
-async function closeChat(chatId: string) {
-  try {
-    await $fetch(`/api/chats/${chatId}`, {
-      method: 'PATCH',
-      body: { status: 'closed' }
-    })
-
-    toast.add({
-      title: 'Chat closed',
-      description: 'The conversation has been closed',
-      color: 'info'
-    })
-
-    await Promise.all([refreshActive(), refreshClosed()])
-  }
-  catch (error: unknown) {
-    toast.add({
-      title: 'Error',
-      description:
-        error instanceof Error ? error.message : 'Failed to close chat',
       color: 'error'
     })
   }
@@ -229,25 +201,6 @@ async function closeChat(chatId: string) {
               </div>
             </div>
           </UCard>
-
-          <UCard>
-            <div class="flex items-center gap-3">
-              <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
-                <UIcon
-                  name="i-heroicons-check-circle"
-                  class="w-6 h-6 text-gray-600"
-                />
-              </div>
-              <div>
-                <p class="text-2xl font-bold">
-                  {{ closedChats?.length || 0 }}
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Closed Chats
-                </p>
-              </div>
-            </div>
-          </UCard>
         </div>
 
         <!-- Tabs -->
@@ -260,12 +213,6 @@ async function closeChat(chatId: string) {
               value: 'active',
               icon: 'i-heroicons-chat-bubble-left-right',
               slot: 'active'
-            },
-            {
-              label: 'Closed Chats',
-              value: 'closed',
-              icon: 'i-heroicons-check-circle',
-              slot: 'closed'
             }
           ]"
         >
@@ -281,13 +228,7 @@ async function closeChat(chatId: string) {
           <template #active>
             <DashboardActiveChatsTab
               :chats="activeChats || null"
-              @close="closeChat"
             />
-          </template>
-
-          <!-- @vue-ignore -->
-          <template #closed>
-            <DashboardClosedChatsTab :chats="closedChats || null" />
           </template>
         </UTabs>
 
